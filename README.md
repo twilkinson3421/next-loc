@@ -55,9 +55,9 @@ The above command will assume the default configuration, and will not automatica
 
 The required dependencies are:
 
+- [chalk-konsole](https://www.npmjs.com/package/chalk-konsole)
 - [string-replace-utils](https://www.npmjs.com/package/string-replace-utils)
 - [accept-language](https://www.npmjs.com/package/accept-language)
-- [rolling-ts-utils](https://www.npmjs.com/package/rolling-ts-utils) (installed with `--dev`)
 
 ## Configuration
 

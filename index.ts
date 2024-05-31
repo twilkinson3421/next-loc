@@ -165,7 +165,7 @@ if (!options.manualInstall) {
   const installSpinner = ora(`Installing dependencies...`).start();
 
   exec(
-    "npm install --save chalk-konsole accept-language && npm install --save-dev rolling-ts-utils",
+    "npm install --save chalk-konsole string-replace-utils accept-language",
     { cwd: process.cwd() },
     (error, _stdout, stderr) => {
       if (error || stderr) {
@@ -178,7 +178,7 @@ if (!options.manualInstall) {
   );
 } else {
   console.log(
-    `Required dependencies:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34mrolling-ts-utils\x1b[0m\n\x1b[34maccept-language\x1b[0m`
+    `Required dependencies:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34maccept-language\x1b[0m`
   );
 }
 
