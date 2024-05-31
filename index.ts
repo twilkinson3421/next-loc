@@ -107,7 +107,7 @@ if (!useDefault) {
   const dataToWrite = `import { createLocaleConfig } from "./internal/controller";\n\nexport const localeConfig = createLocaleConfig(${configObjectToWrite} as const);`;
 
   try {
-    fs.writeFileSync("./source/locale/config.ts", dataToWrite);
+    fs.writeFileSync("./source/config.ts", dataToWrite);
   } catch (error) {
     console.error(`Failed to write config file: ${(error as any).message}`);
   }
@@ -119,5 +119,20 @@ const destinationDir = path.join(process.cwd(), destinationPath);
 const destinationDirExists = fs.existsSync(destinationDir);
 if (!destinationDirExists) fs.mkdirSync(destinationDir, { recursive: true });
 
-// TODO Copy source files to user's project
-// TODO Install dependencies in user's project
+function copyFiles(sourceDir: string, destinationDir: string) {
+  const files = fs.readdirSync(sourceDir);
+
+  for (const file of files) {
+    const sourcePath = path.join(sourceDir, file);
+    const destinationPath = path.join(destinationDir, file);
+
+    if (fs.statSync(sourcePath).isDirectory()) {
+      fs.mkdirSync(destinationPath, { recursive: true });
+      copyFiles(sourcePath, destinationPath);
+    } else {
+      fs.copyFileSync(sourcePath, destinationPath);
+    }
+  }
+}
+
+copyFiles(sourceDir, destinationDir);
