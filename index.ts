@@ -128,14 +128,15 @@ if (!useDefault) {
 
   try {
     fs.writeFileSync(path.join(sourceDir, "config.ts"), dataToWrite);
+    configSpinner.succeed(`Config file written!`);
   } catch (error) {
-    console.error(`Failed to write config file: ${(error as any).message}`);
+    configSpinner.fail(
+      `Failed to write config file: ${(error as any).message}`
+    );
   }
-
-  configSpinner.succeed(`Config file written!`); //^ Stop spinner
 }
 
-const copySpinner = ora(`Copying files...`).start(); //^ Start spinner
+const copySpinner = ora(`Copying files...`).start();
 const destinationDir = path.join(process.cwd(), destinationPath);
 
 const destinationDirExists = fs.existsSync(destinationDir);
@@ -158,21 +159,21 @@ function copyFiles(sourceDir: string, destinationDir: string) {
 }
 
 copyFiles(sourceDir, destinationDir);
-copySpinner.succeed(`Files copied!`); //^ Stop spinner
+copySpinner.succeed(`Files copied!`);
 
 if (!options.manualInstall) {
-  const installSpinner = ora(`Installing dependencies...`).start(); //^ Start spinner
+  const installSpinner = ora(`Installing dependencies...`).start();
 
   exec(
     "npm install --save chalk-konsole accept-language && npm install --save-dev rolling-ts-utils",
     { cwd: process.cwd() },
     (error, _stdout, stderr) => {
       if (error || stderr) {
-        console.error(`An error occurred while installing dependencies`);
+        installSpinner.fail(`An error occurred while installing dependencies`);
         return;
       }
 
-      installSpinner.succeed(`Dependencies installed!`); //^ Stop spinner
+      installSpinner.succeed(`Dependencies installed!`);
     }
   );
 } else {
