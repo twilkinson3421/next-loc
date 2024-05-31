@@ -126,7 +126,7 @@ if (!useDefault) {
   const dataToWrite = `import { createLocaleConfig } from "./internal/controller";\n\nexport const localeConfig = createLocaleConfig(${configObjectToWrite} as const);`;
 
   try {
-    fs.writeFileSync("./source/config.ts", dataToWrite);
+    fs.writeFileSync("source/config.ts", dataToWrite);
   } catch (error) {
     console.error(`Failed to write config file: ${(error as any).message}`);
   }
@@ -161,6 +161,8 @@ copyFiles(sourceDir, destinationDir);
 copySpinner.succeed(`Files copied!`); //^ Stop spinner
 
 if (!options.manualInstall) {
+  const installSpinner = ora(`Installing dependencies...`).start(); //^ Start spinner
+
   exec(
     "npm install --save chalk-konsole accept-language && npm install --save-dev rolling-ts-utils",
     { cwd: process.cwd() },
@@ -172,7 +174,7 @@ if (!options.manualInstall) {
         return;
       }
 
-      console.log(stdout);
+      installSpinner.succeed(`Dependencies installed!`); //^ Stop spinner
     }
   );
 }
