@@ -1,5 +1,6 @@
 #!/usr/bin/env -S npx tsx
 
+import { exec } from "child_process";
 import Enquirer from "enquirer";
 import fs from "fs";
 import ora from "ora";
@@ -14,8 +15,6 @@ const options = {
   manualInstall: args.includes("--manual") || args.includes("-m"),
   defaultDestination: args.includes("--default-dest") || args.includes("-dd"),
 };
-
-console.log(`\n\n`);
 
 const { value: useDefault } = options.default
   ? { value: true }
@@ -161,25 +160,23 @@ function copyFiles(sourceDir: string, destinationDir: string) {
 copyFiles(sourceDir, destinationDir);
 copySpinner.succeed(`Files copied!`); //^ Stop spinner
 
-// if (!options.manualInstall) {
-//   exec(
-//     "npm install --save chalk-konsole && npm install --save-dev rolling-ts-utils",
-//     { cwd: process.cwd() },
-//     (error, stdout, stderr) => {
-//       if (error || stderr) {
-//         console.error(
-//           `An error occurred while installing dependencies:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34mrolling-ts-utils\x1b[0m`
-//         );
-//         return;
-//       }
+if (!options.manualInstall) {
+  exec(
+    "npm install --save chalk-konsole && npm install --save-dev rolling-ts-utils",
+    { cwd: process.cwd() },
+    (error, stdout, stderr) => {
+      if (error || stderr) {
+        console.error(
+          `An error occurred while installing dependencies:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34mrolling-ts-utils\x1b[0m`
+        );
+        return;
+      }
 
-//       console.log(stdout);
-//     }
-//   );
-// }
+      console.log(stdout);
+    }
+  );
+}
 
 console.log(
   `\nLoad your middleware from \x1b[34m${destinationPath}/middleware/locale\x1b[0m`
 );
-
-console.log(`\n\n`);
