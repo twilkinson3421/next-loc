@@ -3,10 +3,18 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {},
+  "homepage": "https://github.com/twilkinson3421/next-loc#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/twilkinson3421/next-loc.git"
+  },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "author": {
+    "name": "Thomas Wilkinson",
+    "url": "https://github.com/twilkinson3421"
+  },
+  "license": "MIT",
+  "description": "A localisation library for Next.js",
   "bin": {
     "next-loc": "./index.ts"
   },
@@ -16,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.12.13",
+    "accept-language": "^3.0.18",
     "chalk-konsole": "^1.0.5",
     "string-replace-utils": "^1.0.3"
   }

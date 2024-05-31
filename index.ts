@@ -176,3 +176,7 @@ if (!options.manualInstall) {
     }
   );
 }
+
+console.log(
+  `\nLoad your middleware from \x1b[34m${destinationPath}/middleware/locale\x1b[0m`
+);
