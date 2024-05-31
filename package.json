@@ -1,0 +1,21 @@
+{
+  "name": "next-loc",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "bin": {
+    "next-loc": "./index.ts"
+  },
+  "dependencies": {
+    "chalk-konsole": "^1.0.5",
+    "inquirer": "^9.2.22",
+    "string-replace-utils": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7"
+  }
+}
