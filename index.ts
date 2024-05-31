@@ -7,6 +7,7 @@ import ora from "ora";
 import path from "path";
 
 const { prompt } = Enquirer;
+const sourceDir = path.join(import.meta.dirname, "source");
 
 const args = process.argv.slice(2);
 
@@ -126,7 +127,7 @@ if (!useDefault) {
   const dataToWrite = `import { createLocaleConfig } from "./internal/controller";\n\nexport const localeConfig = createLocaleConfig(${configObjectToWrite} as const);`;
 
   try {
-    fs.writeFileSync("source/config.ts", dataToWrite);
+    fs.writeFileSync(path.join(sourceDir, "config.ts"), dataToWrite);
   } catch (error) {
     console.error(`Failed to write config file: ${(error as any).message}`);
   }
@@ -135,7 +136,6 @@ if (!useDefault) {
 }
 
 const copySpinner = ora(`Copying files...`).start(); //^ Start spinner
-const sourceDir = path.join(import.meta.dirname, "source");
 const destinationDir = path.join(process.cwd(), destinationPath);
 
 const destinationDirExists = fs.existsSync(destinationDir);
@@ -166,16 +166,18 @@ if (!options.manualInstall) {
   exec(
     "npm install --save chalk-konsole accept-language && npm install --save-dev rolling-ts-utils",
     { cwd: process.cwd() },
-    (error, stdout, stderr) => {
+    (error, _stdout, stderr) => {
       if (error || stderr) {
-        console.error(
-          `An error occurred while installing dependencies:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34mrolling-ts-utils\x1b[0m`
-        );
+        console.error(`An error occurred while installing dependencies`);
         return;
       }
 
       installSpinner.succeed(`Dependencies installed!`); //^ Stop spinner
     }
+  );
+} else {
+  console.log(
+    `Required dependencies:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34mrolling-ts-utils\x1b[0m\n\x1b[34maccept-language\x1b[0m`
   );
 }
 
