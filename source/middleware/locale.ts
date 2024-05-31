@@ -45,7 +45,7 @@ export function localeMiddleware(request: NextRequest, _event: NextFetchEvent) {
   })();
 
   if (pattern.test(hostLocale)) {
-    const bestDestination = destinationLocale; // TODO Add best match
+    const bestDestination = destinationLocale; // TODO Add best match - THIS WILL BE IMPLEMENTED IN A FUTURE RELEASE !!!
     const keep = request.nextUrl.pathname.split("/").slice(2);
     const location = !!keep.length ? `/${keep.join("/")}` : "";
     const newPath = `/${bestDestination}${location}`;
