@@ -1,10 +1,11 @@
 import chalk from "chalk";
 import konsole from "chalk-konsole";
 
-import { localeConfig } from "../config";
-import { NextLocTypes } from "../types";
-import { LocalisedString } from "./class";
-import { dictionary } from "./compileDictionary";
+import { localeConfig } from "./config";
+import { LocalisedString } from "./internal/class";
+import { dictionary } from "./internal/compileDictionary";
+
+import type { NextLocTypes } from "./types";
 
 function getTranslation(
   key: string,

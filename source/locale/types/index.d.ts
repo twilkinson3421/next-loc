@@ -1,6 +1,6 @@
 import { localeConfig } from "../config";
 
-import type { TFunction as Type_TFunction } from "../internal/translate";
+import type { TFunction as Type_TFunction } from "../translate";
 
 export namespace NextLocTypes {
   export type Locale = (typeof localeConfig.supported.locales)[number];
@@ -15,6 +15,6 @@ export namespace NextLocTypes {
   export type TFunction = Type_TFunction;
 
   export namespace Internal {
-    type Reference = { [key: string]: string | Reference };
+    export type Reference = { [key: string]: string | Reference };
   }
 }

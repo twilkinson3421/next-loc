@@ -3,7 +3,8 @@ import konsole from "chalk-konsole";
 import { replaceMultiple } from "string-replace-utils";
 
 import { localeConfig } from "../config";
-import { NextLocTypes } from "../types";
+
+import type { NextLocTypes } from "../types";
 
 function compileDictionary() {
   if (typeof window !== "undefined") return undefined;

@@ -10,12 +10,11 @@
   "bin": {
     "next-loc": "./index.ts"
   },
-  "dependencies": {
-    "chalk-konsole": "^1.0.5",
-    "inquirer": "^9.2.22",
-    "string-replace-utils": "^1.0.3"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/inquirer": "^9.0.7"
+    "@types/node": "^20.12.13",
+    "chalk-konsole": "^1.0.5",
+    "enquirer": "^2.4.1",
+    "string-replace-utils": "^1.0.3"
   }
 }
