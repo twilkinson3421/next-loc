@@ -162,7 +162,7 @@ copySpinner.succeed(`Files copied!`); //^ Stop spinner
 
 if (!options.manualInstall) {
   exec(
-    "npm install --save chalk-konsole && npm install --save-dev rolling-ts-utils",
+    "npm install --save chalk-konsole accept-language && npm install --save-dev rolling-ts-utils",
     { cwd: process.cwd() },
     (error, stdout, stderr) => {
       if (error || stderr) {
