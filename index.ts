@@ -1,23 +1,39 @@
 #!/usr/bin/env -S npx tsx
 
+import { exec } from "child_process";
 import Enquirer from "enquirer";
 import fs from "fs";
+import ora from "ora";
 import path from "path";
 
 const { prompt } = Enquirer;
 
-const { value: useDefault } = await prompt<{ value: boolean }>({
-  type: "confirm",
-  name: "value",
-  message: "Use default config?",
-});
+const args = process.argv.slice(2);
 
-const { value: destinationPath } = await prompt<{ value: string }>({
-  type: "input",
-  name: "value",
-  message: "Enter relative path to destination directory",
-  initial: "/src/locale",
-});
+const options = {
+  default: args.includes("--default") || args.includes("-d"),
+  manualInstall: args.includes("--manual") || args.includes("-m"),
+  defaultDestination: args.includes("--default-dest") || args.includes("-dd"),
+};
+
+const { value: useDefault } = options.default
+  ? { value: true }
+  : await prompt<{ value: boolean }>({
+      type: "confirm",
+      name: "value",
+      message: "Use default config?",
+    });
+
+const { value: destinationPath } = options.defaultDestination
+  ? { value: "/src/locale" }
+  : await prompt<{ value: string }>({
+      type: "input",
+      name: "value",
+      message: "Enter relative path to destination directory",
+      initial: "/src/locale",
+    });
+
+if (useDefault) console.log(`\n`);
 
 if (!useDefault) {
   const { value: locales } = await prompt<{ value: string }>({
@@ -86,6 +102,9 @@ if (!useDefault) {
     },
   });
 
+  console.log(`\n`);
+  const configSpinner = ora(`Writing config file...`).start(); //^ Start spinner
+
   const configObjectToWrite = `{
     supportedLocales: ${JSON.stringify(localesArr).replaceAll(",", ", ")},
     supportedNamespaces: ["common"],
@@ -111,8 +130,11 @@ if (!useDefault) {
   } catch (error) {
     console.error(`Failed to write config file: ${(error as any).message}`);
   }
+
+  configSpinner.succeed(`Config file written!`); //^ Stop spinner
 }
 
+const copySpinner = ora(`Copying files...`).start(); //^ Start spinner
 const sourceDir = path.join(import.meta.dirname, "source");
 const destinationDir = path.join(process.cwd(), destinationPath);
 
@@ -136,3 +158,21 @@ function copyFiles(sourceDir: string, destinationDir: string) {
 }
 
 copyFiles(sourceDir, destinationDir);
+copySpinner.succeed(`Files copied!`); //^ Stop spinner
+
+if (!options.manualInstall) {
+  exec(
+    "npm install --save chalk-konsole && npm install --save-dev rolling-ts-utils",
+    { cwd: process.cwd() },
+    (error, stdout, stderr) => {
+      if (error || stderr) {
+        console.error(
+          `An error occurred while installing dependencies:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34mrolling-ts-utils\x1b[0m`
+        );
+        return;
+      }
+
+      console.log(stdout);
+    }
+  );
+}
