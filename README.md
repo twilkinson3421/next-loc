@@ -11,7 +11,7 @@ A modern localisation solution for Next.js. _This is a very early version; Next 
 
 > **_⚠️ Next Loc requires TypeScript to function properly!_**
 
-_Next Loc will work with **npm** or **pnpm**. If you are using another package manager, the required dependencies will not be installed unless you use the `--force-install` flag (will use `npm`). This means that you will have to install them in your project manually._
+_Next Loc will automatically install the required dependencies with **npm** or **pnpm**. If you are using another package manager, the required dependencies will not be installed unless you use the `--force-install` flag (will use `npm`). This means that you will have to install them in your project manually._
 
 Install Next Loc globally:
 
@@ -27,7 +27,7 @@ npx next-loc@latest
 
 ![Basic Usage](./assets/basic_usage.png)
 
-_Made a mistake? Just run the command again to overwrite the existing configuration!_
+_Made a mistake during configuration? Just run the command again to overwrite the existing configuration!_
 
 Next, import the generated middleware into your `middleware.ts` or `middleware.js` file. Refer to the [Next.js docs](https://nextjs.org/docs/app/building-your-application/routing/middleware) for more information. Here is an example implementation:
 

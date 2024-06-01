@@ -1,6 +1,6 @@
 {
   "name": "next-loc",
-  "version": "0.9.3",
+  "version": "0.9.40",
   "type": "module",
   "scripts": {},
   "homepage": "https://github.com/twilkinson3421/next-loc#readme",
@@ -15,7 +15,9 @@
     "localization-next",
     "i18n",
     "i18n-next",
-    "localisation-next"
+    "localisation-next",
+    "nextjs-localization",
+    "nextjs-i18n"
   ],
   "author": {
     "name": "Thomas Wilkinson",
@@ -28,7 +30,8 @@
   },
   "dependencies": {
     "enquirer": "^2.4.1",
-    "ora": "^8.0.1"
+    "ora": "^8.0.1",
+    "tsx": "^4.11.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.13",
