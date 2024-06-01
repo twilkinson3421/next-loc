@@ -194,7 +194,7 @@ if (
   );
 } else {
   console.log(
-    `Required dependencies not installed:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34maccept-language\x1b[0m`
+    `\nRequired dependencies not installed:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34mstring-replace-utils\x1b[0m\n\x1b[34maccept-language\x1b[0m`
   );
 }
 
