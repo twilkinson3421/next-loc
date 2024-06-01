@@ -29,7 +29,19 @@ npx next-loc@latest
 
 _Made a mistake? Just run the command again to overwrite the existing configuration!_
 
-Next, import the generated middleware into your `middleware.ts` or `middleware.js` file. Refer to the [Next.js docs](https://nextjs.org/docs/app/building-your-application/routing/middleware) for more information.
+Next, import the generated middleware into your `middleware.ts` or `middleware.js` file. Refer to the [Next.js docs](https://nextjs.org/docs/app/building-your-application/routing/middleware) for more information. Here is an example implementation:
+
+```ts
+import { localeMiddleware } from "./path/to/middleware";
+
+export const middleware = (request: NextRequest, _event: NextFetchEvent) => {
+  return localeMiddleware(request, _event);
+};
+
+export const config = {
+  matcher: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+};
+```
 
 Create a directory for each locale (with the same name), following the format described by the `dictionaryPath` option in the `config.ts` file.
 
