@@ -37,6 +37,7 @@
     "@types/node": "^20.12.13",
     "accept-language": "^3.0.18",
     "chalk-konsole": "^1.0.5",
-    "string-replace-utils": "^1.0.3"
+    "string-replace-utils": "^1.0.3",
+    "typescript": "^5.4.5"
   }
 }
