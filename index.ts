@@ -9,12 +9,25 @@ import path from "path";
 const { prompt } = Enquirer;
 const sourceDir = path.join(import.meta.dirname, "source");
 
+const pkgManExec = process.argv[0];
 const args = process.argv.slice(2);
 
 const options = {
   default: args.includes("--default") || args.includes("-d"),
-  manualInstall: args.includes("--manual") || args.includes("-m"),
-  defaultDestination: args.includes("--default-dest") || args.includes("-dd"),
+  manualInstall: args.includes("--manual-install") || args.includes("-m"),
+  defaultDestination: args.includes("--default-dir") || args.includes("-dd"),
+  forceInstall: args.includes("--force-install") || args.includes("-f"),
+  pkgMan: ((): "npm" | "pnpm" => {
+    switch (pkgManExec) {
+      case "npx":
+        return "npm";
+      case "pnpx":
+        return "pnpm";
+      default:
+        return "npm";
+    }
+  })(),
+  noInstallByDefault: !["npx", "pnpx"].includes(pkgManExec),
 };
 
 const { value: useDefault } = options.default
@@ -161,11 +174,14 @@ function copyFiles(sourceDir: string, destinationDir: string) {
 copyFiles(sourceDir, destinationDir);
 copySpinner.succeed(`Files copied!`);
 
-if (!options.manualInstall) {
+if (
+  options.forceInstall ||
+  (!options.manualInstall && !options.noInstallByDefault)
+) {
   const installSpinner = ora(`Installing dependencies...`).start();
 
   exec(
-    "npm install --save chalk-konsole string-replace-utils accept-language",
+    `${options.pkgMan} i --save chalk-konsole string-replace-utils accept-language`,
     { cwd: process.cwd() },
     (error, _stdout, stderr) => {
       if (error || stderr) {
@@ -178,7 +194,7 @@ if (!options.manualInstall) {
   );
 } else {
   console.log(
-    `Required dependencies:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34maccept-language\x1b[0m`
+    `Required dependencies not installed:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34maccept-language\x1b[0m`
   );
 }
 

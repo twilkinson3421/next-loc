@@ -11,6 +11,8 @@ A modern localisation solution for Next.js. _This is a very early version; Next 
 
 > **_⚠️ Next Loc requires TypeScript to function properly!_**
 
+_Next Loc will work with **npm** or **pnpm**. If you are using another package manager, the required dependencies will not be installed unless you use the `--force-install` flag (will use `npm`). This means that you will have to install them in your project manually._
+
 Install Next Loc globally:
 
 ```bash
@@ -20,7 +22,7 @@ npm install -g next-loc
 Configure Next Loc in your project:
 
 ```bash
-npx next-loc
+npx next-loc@latest
 ```
 
 ![Basic Usage](./assets/basic_usage.png)
@@ -39,16 +41,17 @@ For example, using the default configuration, the following dictionary files sho
 
 ## Flags
 
-| Flag             | Alternative | Description                                            |
-| ---------------- | ----------- | ------------------------------------------------------ |
-| `--default`      | `-d`        | Use the default configuration.                         |
-| `--default-dest` | `-dd`       | Use the default destination directory (`/src/locale`). |
-| `--manual`       | `-m`        | Don't automatically install required dependencies.     |
+| Flag               | Alternative | Description                                                                 |
+| ------------------ | ----------- | --------------------------------------------------------------------------- |
+| `--default`        | `-d`        | Use the default configuration.                                              |
+| `--default-dir`    | `-dd`       | Use the default destination directory (`/src/locale`).                      |
+| `--manual-install` | `-m`        | Don't automatically install required dependencies.                          |
+| `--force-install`  | `-f`        | Force installation of required dependencies (overrides `--manual-install`). |
 
 Example:
 
 ```bash
-npx next-loc -d --manual
+npx next-loc -d --manual-install
 ```
 
 The above command will assume the default configuration, and will not automatically install any dependencies, leaving it to you.
