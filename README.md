@@ -59,6 +59,10 @@ For example, using the default configuration, the following dictionary files sho
 
 - `src/locale/dictionary/en-GB/common.json`
 
+### Routing
+
+Move all routes into a `[locale]` directory, which allows the current locale to be determined using the URL params. See the [Next.js docs](https://nextjs.org/docs/app/building-your-application/routing/dynamic-routes) for more information.
+
 ### Localisation
 
 **Using `translate(key, dictionary, locale)` _(not preferred)_**
