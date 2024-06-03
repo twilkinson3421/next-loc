@@ -116,6 +116,8 @@ const t = genT(locale, "common.greetings", dictionary);
 const str = t("welcome");
 ```
 
+> **⚠️ Translations are not strings by default, but actually instances of a `LocalisedString` class, which is a direct copy of the `Replaceable` class from [string-replace-utils](https://www.npmjs.com/package/string-replace-utils). This simply provides some useful methods for replacing substrings. You can change this behaviour by modifying the return value of the `getTranslation` function _AND_ the return value in the catch block inside the `translate` function. To replace substrings with React components, it is recommended to use [react-string-replace](https://www.npmjs.com/package/react-string-replace) (this may be integrated in a future release).**
+
 ## Context
 
 ### Locale & Dictionary

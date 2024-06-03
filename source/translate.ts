@@ -29,7 +29,7 @@ export function translate(
   key: string,
   overrideDictionary?: NextLocTypes.Dictionary,
   overrideLocale?: NextLocTypes.Locale
-): LocalisedString<string> {
+) {
   const locale = overrideLocale ?? localeConfig.defaults.locale;
   const scopedDictionary = overrideDictionary ?? dictionary;
   const notFoundMessage = "Translation not found";
