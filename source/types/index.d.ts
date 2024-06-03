@@ -9,7 +9,7 @@ export namespace NextLocTypes {
   export type Namespace = RootNamespace | `${RootNamespace}.${string}`;
   export type LocaleDictionary = Record<RootNamespace, Internal.Reference>;
   export type Dictionary = Record<Locale, LocaleDictionary>;
-  export type LocaleParam = Readonly<{ params: { locale: Locale } }>;
+  export type LocaleParam = Readonly<{ params: LocaleProp }>;
   export type LocaleProp = Readonly<{ locale: Locale }>;
   export type DictionaryProp = Readonly<{ dictionary: Dictionary }>;
   export type TFunction = Type_TFunction;

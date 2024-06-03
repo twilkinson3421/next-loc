@@ -13,11 +13,15 @@ A modern localisation solution for Next.js. _This is a very early version; Next 
 
 _Next Loc will automatically install the required dependencies with **npm** or **pnpm**. If you are using another package manager, the required dependencies will not be installed unless you use the `--force-install` flag (will use `npm`). This means that you will have to install them in your project manually._
 
+### Installation
+
 Install Next Loc globally:
 
 ```bash
 npm install -g next-loc
 ```
+
+### Configuration
 
 Configure Next Loc in your project:
 
@@ -28,6 +32,8 @@ npx next-loc@latest
 ![Basic Usage](./assets/basic_usage.png)
 
 _Made a mistake during configuration? Just run the command again to overwrite the existing configuration!_
+
+### Middleware
 
 Next, import the generated middleware into your `middleware.ts` or `middleware.js` file. Refer to the [Next.js docs](https://nextjs.org/docs/app/building-your-application/routing/middleware) for more information. Here is an example implementation:
 
@@ -43,6 +49,8 @@ export const config = {
 };
 ```
 
+### Dictionary Setup
+
 Create a directory for each locale (with the same name), following the format described by the `dictionaryPath` option in the `config.ts` file.
 
 Create a JSON file for each namespace (with the same name) within each locale directory, following the format described by the `dictionaryPath` option in the `config.ts` file.
@@ -50,6 +58,126 @@ Create a JSON file for each namespace (with the same name) within each locale di
 For example, using the default configuration, the following dictionary files should be created:
 
 - `src/locale/dictionary/en-GB/common.json`
+
+### Localisation
+
+**Using `translate(key, dictionary, locale)` _(not preferred)_**
+
+- During SSR, the dictionary can be omitted as it is imported automatically within the `translate` function.
+- If no dictionary is provided during client-side-rendering, an empty dictionary will be used, thus all translations will not be found.
+- If no locale is provided, the default locale will be used.
+- `key` refers to the full **dot notation** path to the translation. For example, `"common.greetings.welcome"`, would be found at the `welcome` key, within the `greetings` object, within the JSON object in the `common.json` file.
+
+_When using SSR_
+
+```ts
+import { dictionary } from "./path/to/dictionary";
+
+// Get locale from URL params
+
+const str = translate("common.greetings.welcome", dictionary, locale);
+```
+
+_When using client components_
+
+```ts
+const { dictionary, locale } = useLocaleContext();
+const str = translate("common.greetings.welcome", dictionary, locale);
+```
+
+_See the [context documentation](#context)_ for more information.
+
+**Using `genT(locale, namespace, dictionary)` _(preferred)_**
+
+- Returns a translate function
+  - Default locale in the returned function is set to the value of `locale` here
+  - The `key` is appended to the value of `namespace` here (`.` is added automatically)
+  - If a dictionary is provided, it will be used by default in the returned function
+  - All parameters can be overriden by passing them in the returned function (except from `key` which is **always** appended to the `namespace` here)
+- During SSR, the dictionary can be omitted as it is imported automatically within the `translate` function.
+- If no dictionary is provided during client-side-rendering, an empty dictionary will be used, thus all translations will not be found.
+- If no locale is provided, the default locale will be used.
+
+_When using SSR_
+
+```ts
+const t = genT(locale, "common.greetings");
+const str = t("welcome");
+```
+
+_When using client components_
+
+```ts
+const t = genT(locale, "common.greetings", dictionary);
+const str = t("welcome");
+```
+
+## Context
+
+### Locale & Dictionary
+
+Next Loc includes a locale context provider to make it easier to access the locale and dictionary in client components. The recommended usage is to set the context at the app root.
+
+```tsx
+export default function RootLayout({
+  children,
+  params: { locale },
+}: Readonly<{ children: React.ReactNode }> & NextLocTypes.LocaleParam) {
+  return (
+    <html lang={locale}>
+      <body>
+        <LocaleContextProvider {...{ locale, dictionary }}>
+          {children}
+        </LocaleContextProvider>
+        <LocaleLogProvider />
+      </body>
+    </html>
+  );
+}
+```
+
+Use `useLocaleContext()` to access the locale and dictionary in client components.
+
+```tsx
+const { locale, dictionary } = useLocaleContext();
+```
+
+### Translate Function
+
+Next Loc also includes a context provider for the `translate` function. This allows you to create a translate function using `genT`, then pass it to the `<TranslationContextProvider />` component, then use `useTranslationContext()` to access the translate function in client components.
+
+```tsx
+// Using SSR
+
+export const Component = () => {
+  const t = genT(locale, "common.greetings");
+
+  return (
+    <TranslationContextProvider translator={t}>
+      <ChildComponent />
+    </TranslationContextProvider>
+  );
+};
+```
+
+```tsx
+// Child (client) component
+
+export const ChildComponent = () => {
+  const { translator: t } = useTranslationContext();
+
+  return <p>{t("welcome")}</p>;
+};
+```
+
+## Log Errors & Warnings
+
+Next Loc makes some checks to ensure that localisation will function as expected (these can be expected in `internal/checks.ts`). To enable these checks, add the `<LocaleLogProvider />` component at the app root.
+
+These checks cover:
+
+- Checking that all supported locales satisfy the `localePattern` specified in the `config.ts` file
+- Checking that the default locale is included as a supported locale
 
 ## Flags
 
