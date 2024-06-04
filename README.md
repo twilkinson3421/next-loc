@@ -11,7 +11,7 @@ A modern localisation solution for Next.js. _This is a very early version; Next 
 
 > **_⚠️ Next Loc requires TypeScript to function properly!_**
 
-_Next Loc will automatically install the required dependencies with **npm** or **pnpm**. If you are using another package manager, the required dependencies will not be installed unless you use the `--force-install` flag (will use `npm`). This means that you will have to install them in your project manually._
+_Next Loc will automatically install the required dependencies with **npm** or **pnpm**. If you are using another package manager, the required dependencies will not be installed unless you use the `--force-install` flag (will use `npm`). This means that you will have to install them in your project manually. See the list of required dependencies [here](#required-dependencies)._
 
 ### Installation
 
@@ -202,11 +202,12 @@ npx next-loc -d --manual-install
 
 The above command will assume the default configuration, and will not automatically install any dependencies, leaving it to you.
 
-The required dependencies are:
+### Required Dependencies
 
 - [chalk-konsole](https://www.npmjs.com/package/chalk-konsole)
 - [string-replace-utils](https://www.npmjs.com/package/string-replace-utils)
 - [accept-language](https://www.npmjs.com/package/accept-language)
+- [smob](https://www.npmjs.com/package/smob)
 
 ## Configuration
 
@@ -221,6 +222,7 @@ Next Loc generates a configuration file, `config.ts` within the destination dire
   cookieName: "hl",
   localePattern: /[a-z]{2}-[A-Z]{2}/,
   dictionaryPath: "src/locale/dictionary/{locale}/{namespace}.json",
+  inherits: {},
   ignoreMiddleware: [
     "/static",
     "/api",
@@ -260,9 +262,50 @@ The pattern for supported locales. This is used when the request URL does not co
 
 The path to the JSON dictionary files. This should include `{locale}` and `{namespace}` to point to the correct files for each locale and namespace during dictionary compilation. See [Using Non-JSON Dictionaries](#using-non-json-dictionaries) below for more information.
 
+**`inherits`**
+
+Declare dictionary inheritance, in the format `{ {locale}: {other locales}[], ... }`. See [inheritance](#inheritance) below for more information.
+
 **`ignoreMiddleware`**
 
 An array of paths for which the middleware will return an unmodified response. This is useful for ignoring static files which should not differ based on locale, such as `/favicon.ico`. Middleware execution can be prevented via the `config` object within `middleware.ts`, as referenced by the [Next.js docs](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths). Paths in `ignoreMiddleware` will **NOT** prevent middleware from being executed.
+
+## Inheritance & Global Dictionaries
+
+### Inheritance
+
+Next Loc provides a property in the config object, `inherits`, which allows locales to inherit translations from other locales. This is useful for implementing locales for different cultures within the same language. For example, if your site has the locale `en-GB`, but you also want to support the locale `en-US`, instead of copying every file from the `en-GB` directory, you can simply add the following to the `config.ts` file:
+
+```ts
+inherits: {
+  "en-US": ["en-GB"]
+}
+```
+
+This means that every localisation from `en-GB` is inherited by `en-US`. From here, you can add unique translations to `en-US` as normal, and they will overwrite the translations inherited from `en-GB`. It is still recommended, but not necessary, to create the required, empty (valid JSON) dictionary files for each namespace in `en-US` to prevent Next Loc from throwing an error during dictionary-compilation.
+
+### Global Dictionaries
+
+Next Loc also provides support for global dictionaries. A global dictionary is, in essence, "inherited" by **ALL** locales. To use global dictionaries, create a `GLOBAL` directory **in the same** directory as the normal locales. Within this `GLOBAL` directory, you can create a JSON file for each namespace - the names for global namespaces do not have to match the names of the regular namespaces, although in many applications this will be the case. Translations located in global dictionaries are accessed in the same way as regular localisations. For example, if there is a file `GLOBAL/metadata.json`, its translations can be accessed as follows.
+
+```tsx
+//...
+
+<p>{translate("metadata.site.title", locale, dictionary)}</p>
+
+//...
+```
+
+### Priority
+
+Dictionaries are compiled in the following order:
+
+- Global dictionaries
+- Inherited dictionaries (overwrite global dictionaries)
+  - Inherited locales are compiled in the order in which they are listed in `inherits` property
+- Regular dictionaries
+
+For example, if `en-US` inherits from `["en-GB", "en-CA"]`, and the application makes use of global dictionaries, the global dictionaries will be compiled first, then merged with the inherited dictionaries, first `en-GB`, then `en-CA`, any conflicts being overwritten by the inherited dictionaries in the order of their declaration (`en-CA` overwrites conflicts with `en-GB`), then the regular dictionaries for `en-US` will be compiled last, any conflicts being overwritten by the regular dictionaries.
 
 ## Using Non-JSON Dictionaries
 

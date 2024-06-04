@@ -43,8 +43,8 @@ const { value: destinationPath } = options.defaultDestination
   : await prompt<{ value: string }>({
       type: "input",
       name: "value",
-      message: "Enter relative path to destination directory",
-      initial: "/src/locale",
+      message: "Enter path to destination directory",
+      initial: "src/locale",
     });
 
 if (useDefault) console.log(`\n`);
@@ -127,6 +127,7 @@ if (!useDefault) {
     cookieName: ${JSON.stringify(cookieName)},
     localePattern: ${localeFormat},
     dictionaryPath: ${JSON.stringify(pathToDictionary)},
+    inherits: {},
     ignoreMiddleware: [
       "/static",
       "/api",
@@ -181,7 +182,7 @@ if (
   const installSpinner = ora(`Installing dependencies...`).start();
 
   exec(
-    `${options.pkgMan} i --save chalk-konsole string-replace-utils accept-language`,
+    `${options.pkgMan} i --save chalk-konsole string-replace-utils accept-language smob`,
     { cwd: process.cwd() },
     (error, _stdout, stderr) => {
       if (error || stderr) {
@@ -194,7 +195,7 @@ if (
   );
 } else {
   console.log(
-    `\nRequired dependencies not installed:\n\x1b[34mchalk-konsole\x1b[0m\n\x1b[34mstring-replace-utils\x1b[0m\n\x1b[34maccept-language\x1b[0m`
+    `\nRequired dependencies not installed:\n\x1b[34mchalk-konsole\nstring-replace-utils\naccept-language\nsmob\x1b[0m`
   );
 }
 

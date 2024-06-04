@@ -6,6 +6,13 @@ export function createLocaleConfig<
   CookieName extends Readonly<string>,
   LocalePattern extends Readonly<RegExp>,
   DictionaryPath extends Readonly<string>,
+  Inherits extends Readonly<
+    Partial<{
+      [Locale in SupportedLocales[number]]: Array<
+        Exclude<SupportedLocales[number], Locale>
+      >;
+    }>
+  >,
   IgnoreMiddleware extends Readonly<string[]>
 >({
   supportedLocales,
@@ -15,6 +22,7 @@ export function createLocaleConfig<
   cookieName,
   localePattern,
   dictionaryPath,
+  inherits,
   ignoreMiddleware,
 }: Readonly<{
   supportedLocales: SupportedLocales;
@@ -24,11 +32,13 @@ export function createLocaleConfig<
   cookieName: CookieName;
   localePattern: LocalePattern;
   dictionaryPath: DictionaryPath;
+  inherits: Inherits;
   ignoreMiddleware: IgnoreMiddleware;
 }>) {
   return {
     supported: { locales: supportedLocales, namespaces: supportedNamespaces },
     defaults: { locale: defaultLocale, namespace: defaultNamespace },
+    meta: { inherits },
     server: { cookieName, ignoreMiddleware },
     other: { localePattern, dictionaryPath },
   };
