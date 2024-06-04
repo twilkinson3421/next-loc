@@ -60,55 +60,32 @@ function compileDictionary() {
     }
   }
 
-  //^ Merge with Global Dictionary
   (() => {
-    const pathToGlobalDir = replaceMultiple(
-      localeConfig.other.dictionaryPath,
-      ["{locale}", "/{namespace}.json"] as const,
-      ["GLOBAL", ""] as const
-    );
+    const globalDictionary = {} as NextLocTypes.GlobalDictionary;
 
-    const globalDictionary = {} as NextLocTypes.Internal.Reference;
+    for (const i_globalNamespace of localeConfig.supported.globalNamespaces) {
+      const filePath = replaceMultiple(
+        localeConfig.other.dictionaryPath,
+        ["{locale}", "{namespace}"] as const,
+        ["GLOBAL", i_globalNamespace] as const
+      );
 
-    try {
-      let fs;
-      let path;
-      if (typeof window !== "undefined") throw new Error("Wrong Environment");
-      if (typeof window === "undefined") fs = require("fs");
-      if (typeof window === "undefined") path = require("path");
-
-      const dirContents = (() => {
-        try {
-          return fs.readdirSync(pathToGlobalDir);
-        } catch (error) {
-          return [];
-        }
-      })();
-
-      for (const i_file of dirContents) {
-        try {
-          if (!i_file.endsWith(".json"))
-            throw new Error(`File: ${i_file} is not a JSON file`);
-
-          const filePath = path.join(pathToGlobalDir, i_file);
-          const fileContents = fs.readFileSync(filePath, "utf8");
-
-          globalDictionary[i_file.replace(".json", "")] =
-            JSON.parse(fileContents);
-        } catch (error) {
+      try {
+        let fs;
+        if (typeof window !== "undefined") throw new Error("Wrong Environment");
+        if (typeof window === "undefined") fs = require("fs");
+        const fileContents = fs.readFileSync(filePath, "utf8");
+        //@ts-ignore - Type Error when no global namespaces are defined (will not be reached)
+        globalDictionary[i_globalNamespace] = JSON.parse(fileContents);
+      } catch (error) {
+        if (supportsColor)
           konsole.err(
             `Failed to fetch global dictionary from file: ${chalk.yellow(
-              chalk.italic(`${pathToGlobalDir}/${i_file}`)
+              chalk.italic(filePath)
             )}`,
             (error as any).message || null
           );
-        }
       }
-    } catch (error) {
-      konsole.err(
-        `Failed to detch global dictionary`,
-        (error as any).message || null
-      );
     }
 
     for (const i_locale of localeConfig.supported.locales)

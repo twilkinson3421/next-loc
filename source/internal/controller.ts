@@ -1,6 +1,7 @@
 export function createLocaleConfig<
   SupportedLocales extends Readonly<string[]>,
   SupportedNamespaces extends Readonly<string[]>,
+  GlobalNamespaces extends Readonly<string[]>,
   DefaultLocale extends SupportedLocales[number],
   DefaultNamespace extends SupportedNamespaces[number],
   CookieName extends Readonly<string>,
@@ -17,6 +18,7 @@ export function createLocaleConfig<
 >({
   supportedLocales,
   supportedNamespaces,
+  globalNamespaces,
   defaultLocale,
   defaultNamespace,
   cookieName,
@@ -27,6 +29,7 @@ export function createLocaleConfig<
 }: Readonly<{
   supportedLocales: SupportedLocales;
   supportedNamespaces: SupportedNamespaces;
+  globalNamespaces: GlobalNamespaces;
   defaultLocale: DefaultLocale;
   defaultNamespace: DefaultNamespace;
   cookieName: CookieName;
@@ -36,7 +39,11 @@ export function createLocaleConfig<
   ignoreMiddleware: IgnoreMiddleware;
 }>) {
   return {
-    supported: { locales: supportedLocales, namespaces: supportedNamespaces },
+    supported: {
+      locales: supportedLocales,
+      namespaces: supportedNamespaces,
+      globalNamespaces,
+    },
     defaults: { locale: defaultLocale, namespace: defaultNamespace },
     meta: { inherits },
     server: { cookieName, ignoreMiddleware },

@@ -226,6 +226,10 @@ A string array, containing the locales supported by your application.
 
 A string array, containing the namespaces supported by your application. Each namespace corresponds to an indiviual JSON file located inside each dictionary directory.
 
+**`globalNamespaces`**
+
+A string array, containing the namespaces found in the `GLOBAL` directory, available for all locales.
+
 **`defaultLocale`**
 
 The default locale, used when no cookie is set, and the request URL contains no supported locale.
@@ -270,7 +274,7 @@ This means that every localisation from `en-GB` is inherited by `en-US`. From he
 
 ### Global Dictionaries
 
-Next Loc also provides support for global dictionaries. A global dictionary is, in essence, "inherited" by **ALL** locales. To use global dictionaries, create a `GLOBAL` directory **in the same** directory as the normal locales. Within this `GLOBAL` directory, you can create a JSON file for each namespace - the names for global namespaces do not have to match the names of the regular namespaces, although in many applications this will be the case. Translations located in global dictionaries are accessed in the same way as regular localisations. For example, if there is a file `GLOBAL/metadata.json`, its translations can be accessed as follows.
+Next Loc also provides support for global dictionaries. A global dictionary is, in essence, "inherited" by **ALL** locales. To use global dictionaries, create a `GLOBAL` directory **in the same** directory as the normal locales. Within this `GLOBAL` directory, create a JSON file for each member of `globalNamespaces` in `config.ts`. Translations located in global dictionaries are accessed in the same way as regular localisations. For example, if there is a file `GLOBAL/metadata.json`, its translations can be accessed as follows.
 
 ```tsx
 //...

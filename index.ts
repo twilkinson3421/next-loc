@@ -107,6 +107,7 @@ if (!useDefault) {
   const configObjectToWrite = `{
     supportedLocales: ${JSON.stringify(localesArr).replaceAll(",", ", ")},
     supportedNamespaces: ["common"],
+    globalNamespaces: [],
     defaultLocale: ${JSON.stringify(defaultLocale)},
     defaultNamespace: "common",
     cookieName: ${JSON.stringify(cookieName)},

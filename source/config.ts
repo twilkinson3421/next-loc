@@ -3,6 +3,7 @@ import { createLocaleConfig } from "./internal/controller";
 export const localeConfig = createLocaleConfig({
   supportedLocales: ["en-GB"],
   supportedNamespaces: ["common"],
+  globalNamespaces: [],
   defaultLocale: "en-GB",
   defaultNamespace: "common",
   cookieName: "hl",
