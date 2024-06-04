@@ -30,6 +30,10 @@ const options = {
   noInstallByDefault: !["npx", "pnpx"].includes(pkgManExec),
 };
 
+if (args.includes("--debug")) {
+  console.log({ pkgManExec, options });
+} // TODO Remove
+
 const { value: useDefault } = options.default
   ? { value: true }
   : await prompt<{ value: boolean }>({
@@ -182,11 +186,13 @@ if (
   const installSpinner = ora(`Installing dependencies...`).start();
 
   exec(
-    `${options.pkgMan} i --save chalk-konsole string-replace-utils accept-language smob`,
+    `${options.pkgMan} i --save chalk chalk-konsole string-replace-utils accept-language smob`,
     { cwd: process.cwd() },
     (error, _stdout, stderr) => {
       if (error || stderr) {
-        installSpinner.fail(`An error occurred while installing dependencies`);
+        installSpinner.fail(
+          `An error occurred while installing dependencies\nRefer to the docs to see required dependencies to install manually`
+        );
         return;
       }
 
@@ -195,7 +201,7 @@ if (
   );
 } else {
   console.log(
-    `\nRequired dependencies not installed:\n\x1b[34mchalk-konsole\nstring-replace-utils\naccept-language\nsmob\x1b[0m`
+    `\nRequired dependencies not installed:\n\x1b[34chalk\nmchalk-konsole\nstring-replace-utils\naccept-language\nsmob\x1b[0m`
   );
 }
 

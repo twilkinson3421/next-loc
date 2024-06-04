@@ -1,6 +1,6 @@
 {
   "name": "next-loc",
-  "version": "0.9.50",
+  "version": "0.9.51",
   "type": "module",
   "scripts": {},
   "homepage": "https://github.com/twilkinson3421/next-loc#readme",
@@ -38,7 +38,7 @@
     "accept-language": "^3.0.18",
     "chalk-konsole": "^1.0.5",
     "smob": "^1.5.0",
-    "string-replace-utils": "^1.0.3",
+    "string-replace-utils": "^1.0.5",
     "typescript": "^5.4.5"
   }
 }
