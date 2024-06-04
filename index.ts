@@ -31,6 +31,7 @@ const options = {
 };
 
 if (args.includes("--debug")) {
+  console.log(process);
   console.log({ pkgManExec, options });
 } // TODO Remove
 

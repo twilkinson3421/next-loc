@@ -204,6 +204,7 @@ The above command will assume the default configuration, and will not automatica
 
 ### Required Dependencies
 
+- [chalk](https://www.npmjs.com/package/chalk)
 - [chalk-konsole](https://www.npmjs.com/package/chalk-konsole)
 - [string-replace-utils](https://www.npmjs.com/package/string-replace-utils)
 - [accept-language](https://www.npmjs.com/package/accept-language)
