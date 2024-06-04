@@ -1,6 +1,5 @@
 #!/usr/bin/env -S npx tsx
 
-import { exec } from "child_process";
 import Enquirer from "enquirer";
 import fs from "fs";
 import ora from "ora";
@@ -9,31 +8,12 @@ import path from "path";
 const { prompt } = Enquirer;
 const sourceDir = path.join(import.meta.dirname, "source");
 
-const pkgManExec = process.argv[0];
 const args = process.argv.slice(2);
 
 const options = {
   default: args.includes("--default") || args.includes("-d"),
-  manualInstall: args.includes("--manual-install") || args.includes("-m"),
   defaultDestination: args.includes("--default-dir") || args.includes("-dd"),
-  forceInstall: args.includes("--force-install") || args.includes("-f"),
-  pkgMan: ((): "npm" | "pnpm" => {
-    switch (pkgManExec) {
-      case "npx":
-        return "npm";
-      case "pnpx":
-        return "pnpm";
-      default:
-        return "npm";
-    }
-  })(),
-  noInstallByDefault: !["npx", "pnpx"].includes(pkgManExec),
 };
-
-if (args.includes("--debug")) {
-  console.log(process);
-  console.log({ pkgManExec, options });
-} // TODO Remove
 
 const { value: useDefault } = options.default
   ? { value: true }
@@ -180,31 +160,9 @@ function copyFiles(sourceDir: string, destinationDir: string) {
 copyFiles(sourceDir, destinationDir);
 copySpinner.succeed(`Files copied!`);
 
-if (
-  options.forceInstall ||
-  (!options.manualInstall && !options.noInstallByDefault)
-) {
-  const installSpinner = ora(`Installing dependencies...`).start();
-
-  exec(
-    `${options.pkgMan} i --save chalk chalk-konsole string-replace-utils accept-language smob`,
-    { cwd: process.cwd() },
-    (error, _stdout, stderr) => {
-      if (error || stderr) {
-        installSpinner.fail(
-          `An error occurred while installing dependencies\nRefer to the docs to see required dependencies to install manually`
-        );
-        return;
-      }
-
-      installSpinner.succeed(`Dependencies installed!`);
-    }
-  );
-} else {
-  console.log(
-    `\nRequired dependencies not installed:\n\x1b[34mchalk\nchalk-konsole\nstring-replace-utils\naccept-language\nsmob\x1b[0m`
-  );
-}
+console.log(
+  `\nRequired dependencies:\n\x1b[34mchalk\nchalk-konsole\nstring-replace-utils\naccept-language\nsmob\x1b[0m`
+);
 
 console.log(
   `\nLoad your middleware from \x1b[34m${destinationPath}/middleware/locale\x1b[0m`

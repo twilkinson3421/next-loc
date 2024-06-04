@@ -1,25 +1,33 @@
 # **Next Loc**
 
-A modern localisation solution for Next.js. _This is a very early version; Next Loc will improve and evolve in the future._
+A modern localisation solution for Next.js, featuring **Full TypeScript support**, **SSR support**, **easy setup & configuration**, **included middleware**, **global dictionaries & dictionary inheritance**. _This is a very early version; Next Loc will improve and evolve in the future._
 
-- **Proper TypeScript support**
-- **Easy Setup**
-- **Support for SSR**
-- **Middleware Included**
-
-## Basic Usage
-
-> **_⚠️ Next Loc requires TypeScript to function properly!_**
-
-_Next Loc will automatically install the required dependencies with **npm** or **pnpm**. If you are using another package manager, the required dependencies will not be installed unless you use the `--force-install` flag (will use `npm`). This means that you will have to install them in your project manually. See the list of required dependencies [here](#required-dependencies)._
-
-### Installation
+## Installation
 
 Install Next Loc globally:
 
 ```bash
 npm install -g next-loc
 ```
+
+### Options
+
+| Flag            | Alternative | Description                                            |
+| --------------- | ----------- | ------------------------------------------------------ |
+| `--default`     | `-d`        | Use the default configuration.                         |
+| `--default-dir` | `-dd`       | Use the default destination directory (`/src/locale`). |
+
+## Required Dependencies
+
+Next Loc requires the following packages to be installed in your project directory:
+
+- [chalk](https://www.npmjs.com/package/chalk)
+- [chalk-konsole](https://www.npmjs.com/package/chalk-konsole)
+- [string-replace-utils](https://www.npmjs.com/package/string-replace-utils)
+- [accept-language](https://www.npmjs.com/package/accept-language)
+- [smob](https://www.npmjs.com/package/smob)
+
+## Basic Usage
 
 ### Configuration
 
@@ -184,31 +192,6 @@ These checks cover:
 
 - Checking that all supported locales satisfy the `localePattern` specified in the `config.ts` file
 - Checking that the default locale is included as a supported locale
-
-## Flags
-
-| Flag               | Alternative | Description                                                                 |
-| ------------------ | ----------- | --------------------------------------------------------------------------- |
-| `--default`        | `-d`        | Use the default configuration.                                              |
-| `--default-dir`    | `-dd`       | Use the default destination directory (`/src/locale`).                      |
-| `--manual-install` | `-m`        | Don't automatically install required dependencies.                          |
-| `--force-install`  | `-f`        | Force installation of required dependencies (overrides `--manual-install`). |
-
-Example:
-
-```bash
-npx next-loc -d --manual-install
-```
-
-The above command will assume the default configuration, and will not automatically install any dependencies, leaving it to you.
-
-### Required Dependencies
-
-- [chalk](https://www.npmjs.com/package/chalk)
-- [chalk-konsole](https://www.npmjs.com/package/chalk-konsole)
-- [string-replace-utils](https://www.npmjs.com/package/string-replace-utils)
-- [accept-language](https://www.npmjs.com/package/accept-language)
-- [smob](https://www.npmjs.com/package/smob)
 
 ## Configuration
 
