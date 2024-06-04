@@ -201,7 +201,7 @@ if (
   );
 } else {
   console.log(
-    `\nRequired dependencies not installed:\n\x1b[34chalk\nmchalk-konsole\nstring-replace-utils\naccept-language\nsmob\x1b[0m`
+    `\nRequired dependencies not installed:\n\x1b[34mchalk\nchalk-konsole\nstring-replace-utils\naccept-language\nsmob\x1b[0m`
   );
 }
 
