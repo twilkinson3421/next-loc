@@ -4,6 +4,8 @@ import { createMerger } from "smob";
 import { replaceMultiple } from "string-replace-utils";
 
 import { localeConfig } from "../config";
+import { GLOBAL_DICT_DIR_NAME } from "./constants";
+import { getShouldSuppressENOENT } from "./utils";
 
 import type { NextLocTypes } from "../types";
 const merger = createMerger({ priority: "right" });
@@ -29,12 +31,18 @@ function compileDictionary() {
         const fileContents = fs.readFileSync(filePath, "utf8");
         localeDictionary[i_namespace] = JSON.parse(fileContents);
       } catch (error) {
+        if (
+          getShouldSuppressENOENT(i_locale) &&
+          (error as any)?.code === "ENOENT"
+        )
+          continue;
+
         if (supportsColor)
           konsole.err(
             `Failed to fetch dictionary from file: ${chalk.yellow(
               chalk.italic(filePath)
             )}`,
-            (error as any).message || null
+            (error as any)?.message ?? null
           );
       }
     }
@@ -51,7 +59,7 @@ function compileDictionary() {
       for (const i_inherited of localeConfig.meta.inherits[
         i_locale
       ].toReversed()) {
-        //& Reversed -> Translations from locales at the end of the array have higher priority than those at the start
+        //^ Reversed -> Locales at the end of the array have higher priority than those at the start
         dictionary[i_locale] = merger(
           dictionary[i_inherited as NextLocTypes.Locale],
           dictionary[i_locale]
@@ -60,6 +68,7 @@ function compileDictionary() {
     }
   }
 
+  //^ Merge with Global Dictionaries
   (() => {
     const globalDictionary = {} as NextLocTypes.GlobalDictionary;
 
@@ -67,7 +76,7 @@ function compileDictionary() {
       const filePath = replaceMultiple(
         localeConfig.other.dictionaryPath,
         ["{locale}", "{namespace}"] as const,
-        ["GLOBAL", i_globalNamespace] as const
+        [GLOBAL_DICT_DIR_NAME, i_globalNamespace] as const
       );
 
       try {
@@ -75,15 +84,20 @@ function compileDictionary() {
         if (typeof window !== "undefined") throw new Error("Wrong Environment");
         if (typeof window === "undefined") fs = require("fs");
         const fileContents = fs.readFileSync(filePath, "utf8");
-        //@ts-ignore - Type Error when no global namespaces are defined (will not be reached)
-        globalDictionary[i_globalNamespace] = JSON.parse(fileContents);
+        (globalDictionary as any)[i_globalNamespace] = JSON.parse(fileContents);
       } catch (error) {
+        if (
+          getShouldSuppressENOENT(GLOBAL_DICT_DIR_NAME) &&
+          (error as any)?.code === "ENOENT"
+        )
+          continue;
+
         if (supportsColor)
           konsole.err(
             `Failed to fetch global dictionary from file: ${chalk.yellow(
               chalk.italic(filePath)
             )}`,
-            (error as any).message || null
+            (error as any)?.message ?? null
           );
       }
     }

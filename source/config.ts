@@ -18,4 +18,9 @@ export const localeConfig = createLocaleConfig({
     "robots.txt",
     "sitemap.xml",
   ],
+  suppress: {
+    missingDictionary: false,
+    localeSatisfiesPattern: false,
+    defaultLocaleIsSupported: false,
+  },
 } as const);

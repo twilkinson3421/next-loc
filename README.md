@@ -12,10 +12,10 @@ npm install -g next-loc
 
 ### Options
 
-| Flag            | Alternative | Description                                            |
-| --------------- | ----------- | ------------------------------------------------------ |
-| `--default`     | `-d`        | Use the default configuration.                         |
-| `--default-dir` | `-dd`       | Use the default destination directory (`/src/locale`). |
+| Flag            | Alternative | Description                                           |
+| --------------- | ----------- | ----------------------------------------------------- |
+| `--default`     | `-d`        | Use the default configuration.                        |
+| `--default-dir` | `-dd`       | Use the default destination directory (`src/locale`). |
 
 ## Required Dependencies
 
@@ -186,7 +186,7 @@ export const ChildComponent = () => {
 
 ## Log Errors & Warnings
 
-Next Loc makes some checks to ensure that localisation will function as expected (these can be expected in `internal/checks.ts`). To enable these checks, add the `<LocaleLogProvider />` component at the app root.
+Next Loc makes some checks to ensure that localisation will function as expected (these can be inspected in `internal/checks.ts`). To enable these checks, add the `<LocaleLogProvider />` component at the app root.
 
 These checks cover:
 
@@ -201,6 +201,7 @@ Next Loc generates a configuration file, `config.ts` within the destination dire
 {
   supportedLocales: ["en-GB"],
   supportedNamespaces: ["common"],
+  globalNamespaces: [],
   defaultLocale: "en-GB",
   defaultNamespace: "common",
   cookieName: "hl",
@@ -215,6 +216,11 @@ Next Loc generates a configuration file, `config.ts` within the destination dire
     "robots.txt",
     "sitemap.xml",
   ],
+  suppress: {
+    missingDictionary: false,
+    localeSatisfiesPattern: false,
+    defaultLocaleIsSupported: false,
+  },
 }
 ```
 
@@ -258,6 +264,14 @@ Declare dictionary inheritance, in the format `{ {locale}: {other locales}[], ..
 
 An array of paths for which the middleware will return an unmodified response. This is useful for ignoring static files which should not differ based on locale, such as `/favicon.ico`. Middleware execution can be prevented via the `config` object within `middleware.ts`, as referenced by the [Next.js docs](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths). Paths in `ignoreMiddleware` will **NOT** prevent middleware from being executed.
 
+**`suppress`**
+
+Allows you to suppress certain errors.
+
+- `missingDictionary`: If `true`, no errors will be shown when a dictionary is missing. If an _array containing locales_ is provided, only errors for those locales will be suppressed.
+- `localeSatisfiesPattern`: If `true`, no errors will be shown when a locale does not satisfy the `localePattern` specified in the `config.ts` file.
+- `defaultLocaleIsSupported`: If `true`, no error will be shown when the default locale is not included as a supported locale.
+
 ## Inheritance & Global Dictionaries
 
 ### Inheritance
@@ -270,7 +284,7 @@ inherits: {
 }
 ```
 
-This means that every localisation from `en-GB` is inherited by `en-US`. From here, you can add unique translations to `en-US` as normal, and they will overwrite the translations inherited from `en-GB`. It is still recommended, but not necessary, to create the required, empty (valid JSON) dictionary files for each namespace in `en-US` to prevent Next Loc from throwing an error during dictionary-compilation.
+This means that every localisation from `en-GB` is inherited by `en-US`. From here, you can add unique translations to `en-US` as normal, and they will overwrite the translations inherited from `en-GB`. To prevent errors due to missing dictionary files for `en-US`, make sure to set `suppress.missingDictionary` to `true`, or include `en-US` in its array.
 
 ### Global Dictionaries
 

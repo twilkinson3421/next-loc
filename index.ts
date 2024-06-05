@@ -122,6 +122,11 @@ if (!useDefault) {
       "robots.txt",
       "sitemap.xml",
     ],
+    suppress: {
+      missingDictionary: false,
+      localeSatisfiesPattern: false,
+      defaultLocaleIsSupported: false,
+    },
   }`;
 
   const dataToWrite = `import { createLocaleConfig } from "./internal/controller";\n\nexport const localeConfig = createLocaleConfig(${configObjectToWrite} as const);`;

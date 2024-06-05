@@ -1,4 +1,5 @@
 import { localeConfig } from "../config";
+import { GLOBAL_DICT_DIR_NAME } from "../internal/constants";
 
 import type { TFunction as Type_TFunction } from "../translate";
 
@@ -22,6 +23,7 @@ export namespace NextLocTypes {
   export type LocaleProp = Readonly<{ locale: Locale }>;
   export type DictionaryProp = Readonly<{ dictionary: Dictionary }>;
   export type TFunction = Type_TFunction;
+  export type GlobalDirNameType = typeof GLOBAL_DICT_DIR_NAME;
 
   export namespace Internal {
     export type Reference = { [key: string]: string | Reference };

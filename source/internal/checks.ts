@@ -5,6 +5,7 @@ import { localeConfig } from "../config";
 
 export function checkLocaleConfig() {
   for (const i_locale of localeConfig.supported.locales) {
+    if (localeConfig.other.suppress.localeSatisfiesPattern) break;
     if (!localeConfig.other.localePattern.test(i_locale))
       konsole.warn(
         `Locale ${chalk.yellow(
@@ -15,7 +16,10 @@ export function checkLocaleConfig() {
       );
   }
 
-  if (!localeConfig.supported.locales.includes(localeConfig.defaults.locale)) {
+  if (
+    !localeConfig.supported.locales.includes(localeConfig.defaults.locale) &&
+    localeConfig.other.suppress.defaultLocaleIsSupported
+  ) {
     konsole.err(
       `Default locale ${chalk.yellow(
         chalk.italic(localeConfig.defaults.locale)
