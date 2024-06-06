@@ -1,8 +1,14 @@
 {
   "name": "next-loc",
-  "version": "0.9.56",
+  "version": "0.9.57",
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "build": "tsc"
+  },
+  "files": [
+    "/dist",
+    "/source"
+  ],
   "homepage": "https://github.com/twilkinson3421/next-loc#readme",
   "repository": {
     "type": "git",
@@ -26,12 +32,11 @@
   "license": "MIT",
   "description": "A localisation library for Next.js",
   "bin": {
-    "next-loc": "./index.ts"
+    "next-loc": "./dist/index.js"
   },
   "dependencies": {
     "enquirer": "^2.4.1",
-    "ora": "^8.0.1",
-    "tsx": "^4.11.0"
+    "ora": "^8.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.12.13",
