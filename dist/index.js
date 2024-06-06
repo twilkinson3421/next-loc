@@ -4,7 +4,7 @@ import fs from "fs";
 import ora from "ora";
 import path from "path";
 const { prompt } = Enquirer;
-const sourceDir = path.join(import.meta.dirname, "source");
+const sourceDir = path.join(import.meta.dirname, "../source");
 const args = process.argv.slice(2);
 const options = {
   default: args.includes("--default") || args.includes("-d"),
