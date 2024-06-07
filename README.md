@@ -10,13 +10,6 @@ Install Next Loc globally:
 npm install -g next-loc
 ```
 
-### Options
-
-| Flag            | Alternative | Description                                           |
-| --------------- | ----------- | ----------------------------------------------------- |
-| `--default`     | `-d`        | Use the default configuration.                        |
-| `--default-dir` | `-dd`       | Use the default destination directory (`src/locale`). |
-
 ## Required Dependencies
 
 Next Loc requires the following packages to be installed in your project directory:
@@ -38,6 +31,13 @@ npx next-loc@latest
 ```
 
 ![Basic Usage](./assets/basic_usage.png)
+
+**Options**
+
+| Flag            | Alternative | Description                                           |
+| --------------- | ----------- | ----------------------------------------------------- |
+| `--default`     | `-d`        | Use the default configuration.                        |
+| `--default-dir` | `-dd`       | Use the default destination directory (`src/locale`). |
 
 _Made a mistake during configuration? Just run the command again to overwrite the existing configuration!_
 
