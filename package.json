@@ -1,6 +1,6 @@
 {
   "name": "next-loc",
-  "version": "0.9.60",
+  "version": "0.9.61",
   "type": "module",
   "scripts": {
     "build": "tsc"

@@ -58,7 +58,7 @@ function compileDictionary() {
     ) {
       for (const i_inherited of localeConfig.meta.inherits[
         i_locale
-      ].toReversed()) {
+      ].reverse()) {
         //^ Reversed -> Locales at the end of the array have higher priority than those at the start
         dictionary[i_locale] = merger(
           dictionary[i_inherited as NextLocTypes.Locale],
