@@ -1,5 +1,6 @@
 import { localeConfig } from "../config";
-import { NextLocTypes } from "../types";
+
+import type { NextLocTypes } from "../types";
 
 export function getShouldSuppressENOENT(
   locale: NextLocTypes.Locale | NextLocTypes.GlobalDirNameType

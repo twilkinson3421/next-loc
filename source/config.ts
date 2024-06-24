@@ -23,4 +23,5 @@ export const localeConfig = createLocaleConfig({
     localeSatisfiesPattern: false,
     defaultLocaleIsSupported: false,
   },
+  optOutCompression: false,
 } as const);

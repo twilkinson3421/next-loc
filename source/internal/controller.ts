@@ -1,4 +1,4 @@
-import { NextLocTypes } from "../types";
+import type { NextLocTypes } from "../types";
 
 export function createLocaleConfig<
   SupportedLocales extends Readonly<string[]>,
@@ -23,7 +23,8 @@ export function createLocaleConfig<
       | Array<SupportedLocales[number] | NextLocTypes.GlobalDirNameType>;
     localeSatisfiesPattern: boolean;
     defaultLocaleIsSupported: boolean;
-  }>
+  }>,
+  OptOutCompression extends Readonly<boolean>
 >({
   supportedLocales,
   supportedNamespaces,
@@ -36,6 +37,7 @@ export function createLocaleConfig<
   inherits,
   ignoreMiddleware,
   suppress,
+  optOutCompression,
 }: Readonly<{
   supportedLocales: SupportedLocales;
   supportedNamespaces: SupportedNamespaces;
@@ -48,6 +50,7 @@ export function createLocaleConfig<
   inherits: Inherits;
   ignoreMiddleware: IgnoreMiddleware;
   suppress: Suppress;
+  optOutCompression: OptOutCompression;
 }>) {
   return {
     supported: {
@@ -58,6 +61,6 @@ export function createLocaleConfig<
     defaults: { locale: defaultLocale, namespace: defaultNamespace },
     meta: { inherits },
     server: { cookieName, ignoreMiddleware },
-    other: { localePattern, dictionaryPath, suppress },
+    other: { localePattern, dictionaryPath, suppress, optOutCompression },
   };
 }

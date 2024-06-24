@@ -14,11 +14,12 @@ npm install -g next-loc
 
 Next Loc requires the following packages to be installed in your project directory:
 
-- [chalk](https://www.npmjs.com/package/chalk)
-- [chalk-konsole](https://www.npmjs.com/package/chalk-konsole)
-- [string-replace-utils](https://www.npmjs.com/package/string-replace-utils)
-- [accept-language](https://www.npmjs.com/package/accept-language)
-- [smob](https://www.npmjs.com/package/smob)
+- [`chalk`](https://www.npmjs.com/package/chalk)
+- [`chalk-konsole`](https://www.npmjs.com/package/chalk-konsole)
+- [`string-replace-utils`](https://www.npmjs.com/package/string-replace-utils)
+- [`accept-language`](https://www.npmjs.com/package/accept-language)
+- [`smob`](https://www.npmjs.com/package/smob)
+- [`lz-string`](https://www.npmjs.com/package/lz-string) (can be changed, see [below](#compression))
 
 ## Basic Usage
 
@@ -231,6 +232,7 @@ Next Loc generates a configuration file, `config.ts` within the destination dire
     localeSatisfiesPattern: false,
     defaultLocaleIsSupported: false,
   },
+  optOutCompression: false,
 }
 ```
 
@@ -282,6 +284,10 @@ Allows you to suppress certain errors.
 - `localeSatisfiesPattern`: If `true`, no errors will be shown when a locale does not satisfy the `localePattern` specified in the `config.ts` file.
 - `defaultLocaleIsSupported`: If `true`, no error will be shown when the default locale is not included as a supported locale.
 
+**`optOutCompression`**
+
+If `true`, Next Loc will not compress the dictionary object. See the [section on compression](#compression) below for more information.
+
 ## Inheritance & Global Dictionaries
 
 ### Inheritance
@@ -318,6 +324,10 @@ Dictionaries are compiled in the following order:
 - Regular dictionaries
 
 For example, if `en-US` inherits from `["en-GB", "en-CA"]`, and the application makes use of global dictionaries, the global dictionaries will be compiled first, then merged with the inherited dictionaries, first `en-GB`, then `en-CA`, any conflicts being overwritten by the inherited dictionaries in the order of their declaration (`en-CA` overwrites conflicts with `en-GB`), then the regular dictionaries for `en-US` will be compiled last, any conflicts being overwritten by the regular dictionaries.
+
+## Compression
+
+Next Loc includes support for compressing the dictionary object. The default and recommended compression method is achieved via the use of [lz-string](https://www.npmjs.com/package/lz-string). To change the compression (and decompression) functions, modify the `compressFunction` and `decompressFunction` functions exported from `internal/compression.ts`. For small sites with a small amount of text, or a small number of locales, you should consider opting out of compression to improve performance.
 
 ## Using Non-JSON Dictionaries
 

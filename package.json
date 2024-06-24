@@ -1,6 +1,6 @@
 {
   "name": "next-loc",
-  "version": "0.9.62",
+  "version": "0.9.63",
   "type": "module",
   "scripts": {
     "build": "tsc"
@@ -43,6 +43,7 @@
     "accept-language": "^3.0.18",
     "chalk": "^5.3.0",
     "chalk-konsole": "^1.0.6",
+    "lz-string": "^1.5.0",
     "smob": "^1.5.0",
     "string-replace-utils": "^1.0.7",
     "typescript": "^5.4.5"

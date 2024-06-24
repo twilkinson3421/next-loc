@@ -4,11 +4,12 @@ import { createContext, useContext } from "react";
 
 import { localeConfig } from "../config";
 import { genT } from "../translate";
-import { NextLocTypes } from "../types";
+
+import type { NextLocTypes } from "../types";
 
 type LocaleContextValue = {
   locale: NextLocTypes.Locale;
-  dictionary?: NextLocTypes.Dictionary;
+  dictionary?: NextLocTypes.ThisDictionaryType;
 };
 
 type TranslationContextValue = {

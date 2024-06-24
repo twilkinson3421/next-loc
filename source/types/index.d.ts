@@ -1,4 +1,5 @@
 import { localeConfig } from "../config";
+import { dictionary } from "../internal/compileDictionary";
 import { GLOBAL_DICT_DIR_NAME } from "../internal/constants";
 
 import type { TFunction as Type_TFunction } from "../translate";
@@ -19,6 +20,8 @@ export namespace NextLocTypes {
     Internal.Reference
   >;
   export type Dictionary = Record<Locale, LocaleDictionary> & GlobalDictionary;
+  export type CompressedDictionary = string;
+  export type ThisDictionaryType = typeof dictionary;
   export type LocaleParam = Readonly<{ params: LocaleProp }>;
   export type LocaleProp = Readonly<{ locale: Locale }>;
   export type DictionaryProp = Readonly<{ dictionary: Dictionary }>;

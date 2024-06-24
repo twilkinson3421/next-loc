@@ -4,13 +4,19 @@ import { createMerger } from "smob";
 import { replaceMultiple } from "string-replace-utils";
 
 import { localeConfig } from "../config";
+import { compressFunction } from "./compression";
 import { GLOBAL_DICT_DIR_NAME } from "./constants";
 import { getShouldSuppressENOENT } from "./utils";
 
 import type { NextLocTypes } from "../types";
+
 const merger = createMerger({ priority: "right" });
 
-function compileDictionary() {
+type Return = typeof localeConfig.other.optOutCompression extends true
+  ? NextLocTypes.Dictionary
+  : NextLocTypes.CompressedDictionary;
+
+function compileDictionary(): Return | undefined {
   if (typeof window !== "undefined") return undefined;
   const dictionary = {} as NextLocTypes.Dictionary;
 
@@ -54,8 +60,10 @@ function compileDictionary() {
   for (const i_locale of localeConfig.supported.locales) {
     if (
       i_locale in localeConfig.meta.inherits &&
+      //@ts-ignore
       Array.isArray(localeConfig.meta.inherits[i_locale])
     ) {
+      //@ts-ignore
       for (const i_inherited of localeConfig.meta.inherits[
         i_locale
       ].reverse()) {
@@ -106,7 +114,11 @@ function compileDictionary() {
       dictionary[i_locale] = merger(globalDictionary, dictionary[i_locale]);
   })();
 
-  return dictionary;
+  //@ts-ignore
+  if (localeConfig.other.optOutCompression) return dictionary;
+  const compressedDictionary = compressFunction(JSON.stringify(dictionary));
+  //@ts-ignore
+  return compressedDictionary;
 }
 
 export const dictionary = compileDictionary();

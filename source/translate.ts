@@ -5,16 +5,20 @@ import { localeConfig } from "./config";
 import { useLocaleContext } from "./context/provider";
 import { LocalisedString } from "./internal/class";
 import { dictionary } from "./internal/compileDictionary";
+import { decompressFunction } from "./internal/compression";
 
 import type { NextLocTypes } from "./types";
 
 function getTranslation(
   key: string,
-  overrideDictionary?: NextLocTypes.Dictionary
+  overrideDictionary?: NextLocTypes.ThisDictionaryType
 ) {
   const segments = key.split(".");
-  let translation = (overrideDictionary ?? dictionary) as any;
+  let translation = (overrideDictionary ?? dictionary!) as any;
   if (!translation) throw new Error("No dictionary provided");
+
+  if (typeof translation === "string")
+    translation = JSON.parse(decompressFunction(translation));
 
   for (const i_segment of segments) {
     if (!(typeof translation === "object" && i_segment in translation))
@@ -28,7 +32,7 @@ function getTranslation(
 
 export function translate(
   key: string,
-  overrideDictionary?: NextLocTypes.Dictionary,
+  overrideDictionary?: NextLocTypes.ThisDictionaryType,
   overrideLocale?: NextLocTypes.Locale
 ) {
   const locale = overrideLocale ?? localeConfig.defaults.locale;
@@ -58,7 +62,7 @@ export type TFunction = typeof translate;
 export function genT(
   genLocale?: NextLocTypes.Locale,
   genNamespace?: NextLocTypes.Namespace,
-  genDictionary?: NextLocTypes.Dictionary
+  genDictionary?: NextLocTypes.ThisDictionaryType
 ): NextLocTypes.TFunction {
   genLocale ??= localeConfig.defaults.locale;
   genNamespace ??= localeConfig.defaults.namespace;
@@ -66,7 +70,7 @@ export function genT(
 
   return (
     key: string,
-    overrideDictionary?: NextLocTypes.Dictionary,
+    overrideDictionary?: NextLocTypes.ThisDictionaryType,
     overrideLocale?: NextLocTypes.Locale
   ) =>
     translate(
@@ -76,7 +80,9 @@ export function genT(
     );
 }
 
-export function useAutoGenT(genNamespace?: NextLocTypes.Namespace): NextLocTypes.TFunction {
+export function useAutoGenT(
+  genNamespace?: NextLocTypes.Namespace
+): NextLocTypes.TFunction {
   const { locale, dictionary } = useLocaleContext();
   return genT(locale, genNamespace, dictionary);
 }
@@ -87,7 +93,7 @@ export function adaptNamespace(
 ): NextLocTypes.TFunction {
   return (
     key: string,
-    overrideDictionary?: NextLocTypes.Dictionary,
+    overrideDictionary?: NextLocTypes.ThisDictionaryType,
     overrideLocale?: NextLocTypes.Locale
   ) =>
     oldFunction(
