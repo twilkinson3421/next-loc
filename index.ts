@@ -127,6 +127,7 @@ if (!useDefault) {
       localeSatisfiesPattern: false,
       defaultLocaleIsSupported: false,
     },
+    optOutCompression: false,
   }`;
 
   const dataToWrite = `import { createLocaleConfig } from "./internal/controller";\n\nexport const localeConfig = createLocaleConfig(${configObjectToWrite} as const);`;
