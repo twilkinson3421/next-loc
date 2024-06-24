@@ -2,6 +2,7 @@ import chalk from "chalk";
 import konsole from "chalk-konsole";
 
 import { localeConfig } from "./config";
+import { useLocaleContext } from "./context/provider";
 import { LocalisedString } from "./internal/class";
 import { dictionary } from "./internal/compileDictionary";
 
@@ -73,6 +74,11 @@ export function genT(
       overrideDictionary ?? genDictionary,
       overrideLocale ?? genLocale
     );
+}
+
+export function useAutoGenT(genNamespace?: NextLocTypes.Namespace): NextLocTypes.TFunction {
+  const { locale, dictionary } = useLocaleContext();
+  return genT(locale, genNamespace, dictionary);
 }
 
 export function adaptNamespace(

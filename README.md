@@ -22,7 +22,7 @@ Next Loc requires the following packages to be installed in your project directo
 
 ## Basic Usage
 
-### Configuration
+### Configuration Setup
 
 Configure Next Loc in your project:
 
@@ -32,7 +32,7 @@ npx next-loc@latest
 
 ![Basic Usage](./assets/basic_usage.png)
 
-**Options**
+#### **Options**
 
 | Flag            | Alternative | Description                                           |
 | --------------- | ----------- | ----------------------------------------------------- |
@@ -71,35 +71,39 @@ For example, using the default configuration, the following dictionary files sho
 
 Move all routes into a `[locale]` directory, which allows the current locale to be determined using the URL params. See the [Next.js docs](https://nextjs.org/docs/app/building-your-application/routing/dynamic-routes) for more information.
 
+### Context Setup
+
+Wrap your app inside the `<LocaleContextProvider>` component at your app root, which allows you to access the current locale and dictionary in client components via the use of the `useLocaleContext()` hook. See the [context documentation](#locale--dictionary) for more information.
+
 ### Localisation
 
-**Using `translate(key, dictionary, locale)` _(not preferred)_**
+#### **Using `translate(key, dictionary, locale)` _(not preferred)_**
 
 - During SSR, the dictionary can be omitted as it is imported automatically within the `translate` function.
 - If no dictionary is provided during client-side-rendering, an empty dictionary will be used, thus all translations will not be found.
 - If no locale is provided, the default locale will be used.
 - `key` refers to the full **dot notation** path to the translation. For example, `"common.greetings.welcome"`, would be found at the `welcome` key, within the `greetings` object, within the JSON object in the `common.json` file.
 
-_When using SSR_
-
 ```ts
-import { dictionary } from "./path/to/dictionary";
+// Usage with SSR
+
+import { dictionary } from "./path/to/compileDictionary";
 
 // Get locale from URL params
 
 const str = translate("common.greetings.welcome", dictionary, locale);
 ```
 
-_When using client components_
-
 ```ts
+// Usage with client components
+
 const { dictionary, locale } = useLocaleContext();
 const str = translate("common.greetings.welcome", dictionary, locale);
 ```
 
-_See the [context documentation](#context)_ for more information.
+_See the [context documentation](#leveraging-context)_ for more information.
 
-**Using `genT(locale, namespace, dictionary)` _(preferred)_**
+#### **Using `genT(locale, namespace, dictionary)` _(preferred)_**
 
 - Returns a translate function
   - Default locale in the returned function is set to the value of `locale` here
@@ -110,29 +114,35 @@ _See the [context documentation](#context)_ for more information.
 - If no dictionary is provided during client-side-rendering, an empty dictionary will be used, thus all translations will not be found.
 - If no locale is provided, the default locale will be used.
 
-_When using SSR_
-
 ```ts
+// Usage with SSR
+
 const t = genT(locale, "common.greetings");
 const str = t("welcome");
 ```
 
-_When using client components_
-
 ```ts
+// Usage with client components
+
 const t = genT(locale, "common.greetings", dictionary);
 const str = t("welcome");
 ```
 
+#### **Using `useAutoGenT(namespace)`**
+
+`useAutoGenT` is a React Hook provided by Next Loc, which acts as a shorthand for `genT(locale, namespace, dictionary)`. It can be used in client components to prevent having to call `useLocaleContext()` to get the dictionary and locale. Instead, the locale and dictionary are retrieved from context within the hook itself.
+
 > **⚠️ Translations are not strings by default, but actually instances of a `LocalisedString` class, which is a direct copy of the `Replaceable` class from [string-replace-utils](https://www.npmjs.com/package/string-replace-utils). This simply provides some useful methods for replacing substrings. You can change this behaviour by modifying the return value of the `getTranslation` function _AND_ the return value in the catch block inside the `translate` function. To replace substrings with React components, it is recommended to use [react-string-replace](https://www.npmjs.com/package/react-string-replace) (this may be integrated in a future release).**
 
-## Context
+## Leveraging Context
 
 ### Locale & Dictionary
 
 Next Loc includes a locale context provider to make it easier to access the locale and dictionary in client components. The recommended usage is to set the context at the app root.
 
 ```tsx
+import { dictionary } from "./path/to/compileDictionary";
+
 export default function RootLayout({
   children,
   params: { locale },
@@ -193,7 +203,7 @@ These checks cover:
 - Checking that all supported locales satisfy the `localePattern` specified in the `config.ts` file
 - Checking that the default locale is included as a supported locale
 
-## Configuration
+## Configuration File
 
 Next Loc generates a configuration file, `config.ts` within the destination directory. This file can be freely modified to suit your needs. This is the default configuration that is generated with the default options during setup:
 
