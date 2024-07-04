@@ -168,7 +168,7 @@ copyFiles(sourceDir, destinationDir);
 copySpinner.succeed(`Files copied!`);
 
 console.log(
-  `\nRequired dependencies:\n\x1b[34mchalk\nchalk-konsole\nstring-replace-utils\naccept-language\nsmob\x1b[0m`
+  `\nRequired dependencies:\n\x1b[34mchalk\nchalk-konsole\nstring-replace-utils\naccept-language\nsmob\nlz-string\x1b[0m`
 );
 
 console.log(
