@@ -3,17 +3,13 @@ import konsole from "chalk-konsole";
 
 import { localeConfig } from "./config";
 import { LocalisedString } from "./internal/class";
-import { dictionary } from "./internal/compileDictionary";
 import { decompressFunction } from "./internal/compression";
 
 import type { NextLocTypes } from "./types";
 
-function getTranslation(
-  key: string,
-  overrideDictionary?: NextLocTypes.ThisDictionaryType
-) {
+function getTranslation(key: string, dictionary?: NextLocTypes.ThisDictionaryType) {
   const segments = key.split(".");
-  let translation = (overrideDictionary ?? dictionary!) as any;
+  let translation = dictionary;
   if (!translation) throw new Error("No dictionary provided");
 
   if (typeof translation === "string")
@@ -31,17 +27,17 @@ function getTranslation(
 
 export function translate(
   key: string,
-  overrideDictionary?: NextLocTypes.ThisDictionaryType,
+  dictionary?: NextLocTypes.ThisDictionaryType,
   overrideLocale?: NextLocTypes.Locale
 ) {
   const locale = overrideLocale ?? localeConfig.defaults.locale;
-  const scopedDictionary = overrideDictionary ?? dictionary;
+  const scopedDictionary = dictionary;
   const notFoundMessage = "Translation not found";
 
   const path = `${locale}.${key}`;
 
   try {
-    const translation = getTranslation(path, scopedDictionary ?? undefined);
+    const translation = getTranslation(path, scopedDictionary);
     if (!translation) throw new Error(notFoundMessage);
     return translation;
   } catch (error) {
@@ -61,20 +57,23 @@ export type TFunction = typeof translate;
 export function genT(
   genLocale?: NextLocTypes.Locale,
   genNamespace?: NextLocTypes.Namespace,
-  genDictionary?: NextLocTypes.ThisDictionaryType
+  genDictionary?: NextLocTypes.ThisDictionaryType,
+  options?: { delayDecompression?: boolean }
 ): NextLocTypes.TFunction {
   genLocale ??= localeConfig.defaults.locale;
   genNamespace ??= localeConfig.defaults.namespace;
-  genDictionary ??= dictionary ?? undefined;
+
+  if (typeof genDictionary === "string" && !options?.delayDecompression)
+    genDictionary = JSON.parse(decompressFunction(genDictionary));
 
   return (
     key: string,
-    overrideDictionary?: NextLocTypes.ThisDictionaryType,
+    dictionary?: NextLocTypes.ThisDictionaryType,
     overrideLocale?: NextLocTypes.Locale
   ) =>
     translate(
       `${genNamespace}.${key}`,
-      overrideDictionary ?? genDictionary,
+      dictionary ?? genDictionary,
       overrideLocale ?? genLocale
     );
 }
@@ -85,12 +84,7 @@ export function adaptNamespace(
 ): NextLocTypes.TFunction {
   return (
     key: string,
-    overrideDictionary?: NextLocTypes.ThisDictionaryType,
+    dictionary?: NextLocTypes.ThisDictionaryType,
     overrideLocale?: NextLocTypes.Locale
-  ) =>
-    oldFunction(
-      `${newNamespace}.${key}`,
-      overrideDictionary ?? undefined,
-      overrideLocale ?? undefined
-    );
+  ) => oldFunction(`${newNamespace}.${key}`, dictionary, overrideLocale);
 }

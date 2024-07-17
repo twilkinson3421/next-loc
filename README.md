@@ -1,6 +1,6 @@
 # **Next Loc**
 
-A modern localisation solution for Next.js, featuring **Full TypeScript support**, **SSR support**, **easy setup & configuration**, **included middleware**, **global dictionaries & dictionary inheritance**. _This is a very early version; Next Loc will improve and evolve in the future._
+A modern localisation solution for Next.js, featuring **Full TypeScript support**, **SSR support**, **easy setup & configuration**, **included middleware**, **global dictionaries & dictionary inheritance**.
 
 ## Installation
 
@@ -40,11 +40,11 @@ npx next-loc@latest
 | `--default`     | `-d`        | Use the default configuration.                        |
 | `--default-dir` | `-dd`       | Use the default destination directory (`src/locale`). |
 
-_Made a mistake during configuration? Just run the command again to overwrite the existing configuration!_
+_Made a mistake during configuration? Just run the command again to overwrite the existing configuration! **Be warned, this will overwrite any customisations you have made to destination directory, including the configuration file and middleware.**_
 
 ### Middleware
 
-Next, import the generated middleware into your `middleware.ts` or `middleware.js` file. Refer to the [Next.js docs](https://nextjs.org/docs/app/building-your-application/routing/middleware) for more information. Here is an example implementation:
+Next, import the generated middleware into your `middleware.ts` or `middleware.js` file. The included middleware is designed to be used as the only middleware in your project out-of-the-box, but can be freely modified to adapt to your middleware implementation. Refer to the [Next.js docs](https://nextjs.org/docs/app/building-your-application/routing/middleware) for more information. Here is an example implementation:
 
 ```ts
 import { localeMiddleware } from "./path/to/middleware";
@@ -74,76 +74,76 @@ Move all routes into a `[locale]` directory, which allows the current locale to 
 
 ### Context Setup
 
-Wrap your app inside the `<LocaleContextProvider>` component at your app root, which allows you to access the current locale and dictionary in client components via the use of the `useLocaleContext()` hook. See the [context documentation](#locale--dictionary) for more information.
+Wrap your app inside the `<LocaleContextProvider>` component at your app root, which allows you to access the current locale in client components via the use of the `useLocaleContext()` hook. See the [locale context documentation](#locale-context) for more information. You will also need to add a `<DictionaryContextProvider />` component at some point in the component tree, which allows you to access the current dictionary in heir client components via the use of the `useDictionaryContext()` hook. See the [dictionary context documentation](#dictionary-context) for more information.
 
 ### Localisation
 
 #### **Using `translate(key, dictionary, locale)` _(not preferred)_**
 
-- During SSR, the dictionary can be omitted as it is imported automatically within the `translate` function.
-- If no dictionary is provided during client-side-rendering, an empty dictionary will be used, thus all translations will not be found.
+- If no dictionary is provided, an empty dictionary will be used, thus all translations will not be found.
 - If no locale is provided, the default locale will be used.
 - `key` refers to the full **dot notation** path to the translation. For example, `"common.greetings.welcome"`, would be found at the `welcome` key, within the `greetings` object, within the JSON object in the `common.json` file.
 
 ```ts
 // Usage with SSR
 
-import { dictionary } from "./path/to/compileDictionary";
+import { compileDictionary } from "./path/to/compileDictionary";
 
 // Get locale from URL params
 
-const str = translate("common.greetings.welcome", dictionary, locale);
+const dictionary = compileDictionary({ locales: [locale], namespaces: ["common"] });
+const str = translate("common.greetings.welcome", dictionary, locale).valueOf();
 ```
 
 ```ts
 // Usage with client components
 
-const { dictionary, locale } = useLocaleContext();
-const str = translate("common.greetings.welcome", dictionary, locale);
+const { locale } = useLocaleContext();
+const { dictionary } = useDictionaryContext();
+const str = translate("common.greetings.welcome", dictionary, locale).valueOf();
 ```
 
 _See the [context documentation](#leveraging-context)_ for more information.
 
-#### **Using `genT(locale, namespace, dictionary)` _(preferred)_**
+#### **Using `genT(locale, namespace, dictionary, options)` _(preferred)_**
 
 - Returns a translate function
   - Default locale in the returned function is set to the value of `locale` here
   - The `key` is appended to the value of `namespace` here (`.` is added automatically)
-  - If a dictionary is provided, it will be used by default in the returned function
+  - The dictionary provided will be used by default in the returned function
   - All parameters can be overriden by passing them in the returned function (except from `key` which is **always** appended to the `namespace` here)
-- During SSR, the dictionary can be omitted as it is imported automatically within the `translate` function.
-- If no dictionary is provided during client-side-rendering, an empty dictionary will be used, thus all translations will not be found.
+- If no dictionary is provided, an empty dictionary will be used, thus all translations will not be found.
 - If no locale is provided, the default locale will be used.
+- The `options` parameter is an optional object containing the following properties:
+  - `delayDecompression?: boolean`: If `true`, the dictionary will not be decompressed in the generated function. It will instead be decompressed on each translation call.
 
 ```ts
 // Usage with SSR
 
-const t = genT(locale, "common.greetings");
-const str = t("welcome");
+const t = genT(locale, "common.greetings", dictionary);
+const str = t("welcome").valueOf();
 ```
 
 ```ts
 // Usage with client components
 
 const t = genT(locale, "common.greetings", dictionary);
-const str = t("welcome");
+const str = t("welcome").valueOf();
 ```
 
-#### **Using `useAutoGenT(namespace)`**
+#### **Using `useAutoGenT(namespace, options)` _(best)_**
 
-`useAutoGenT` is a React Hook provided by Next Loc, which acts as a shorthand for `genT(locale, namespace, dictionary)`. It can be used in client components to prevent having to call `useLocaleContext()` to get the dictionary and locale. Instead, the locale and dictionary are retrieved from context within the hook itself.
+`useAutoGenT` is a React Hook provided by Next Loc, which acts as a shorthand for `genT(locale, namespace, dictionary)`. It can be used in client components to prevent having to call `useLocaleContext()` and `useDictionaryContext()` to get the locale and dictionary. Instead, the locale and dictionary are retrieved from context within the hook itself.
 
 > **⚠️ Translations are not strings by default, but actually instances of a `LocalisedString` class, which is a direct copy of the `Replaceable` class from [string-replace-utils](https://www.npmjs.com/package/string-replace-utils). This simply provides some useful methods for replacing substrings. You can change this behaviour by modifying the return value of the `getTranslation` function _AND_ the return value in the catch block inside the `translate` function. To replace substrings with React components, it is recommended to use [react-string-replace](https://www.npmjs.com/package/react-string-replace) (this may be integrated in a future release).**
 
 ## Leveraging Context
 
-### Locale & Dictionary
+### Locale Context
 
-Next Loc includes a locale context provider to make it easier to access the locale and dictionary in client components. The recommended usage is to set the context at the app root.
+Next Loc includes a locale context provider to make it easier to access the current locale in client components. The recommended usage is to set the context at the app root.
 
 ```tsx
-import { dictionary } from "./path/to/compileDictionary";
-
 export default function RootLayout({
   children,
   params: { locale },
@@ -151,8 +151,70 @@ export default function RootLayout({
   return (
     <html lang={locale}>
       <body>
-        <LocaleContextProvider {...{ locale, dictionary }}>
-          {children}
+        <LocaleContextProvider {...{ locale }}>{children}</LocaleContextProvider>
+        <LocaleLogProvider />
+      </body>
+    </html>
+  );
+}
+```
+
+Use `useLocaleContext()` to access the locale in client components.
+
+```tsx
+const { locale } = useLocaleContext();
+```
+
+### Dictionary Context
+
+Next Loc includes a dictionary context provider to make it easier to access the current dictionary in client components. The recommended usage is to import the locales & namespaces you need (using `compileDictionary`) and use the context provider to expose the dictionary to any child component which require a certain part of the dictionary. This prevents having to pass the entire dictionary to context, instead only having what is needed avaialable. Here is an exmaple:
+
+```tsx
+import { compileDictionary } from "./path/to/compileDictionary";
+
+export const SSRComponent = ({
+  children,
+  params: { locale },
+}: Readonly<{ children: React.ReactNode }> & NextLocTypes.LocaleParam) => {
+  const dictionary = compileDictionary({ locales: [locale], namespaces: ["common"] });
+
+  return (
+    <DictionaryContextProvider {...{ dictionary }}>
+      {children}
+    </DictionaryContextProvider>
+  );
+};
+```
+
+Use `useDictionaryContext()` to access the dictionary in client components.
+
+```tsx
+const { dictionary } = useDictionaryContext();
+```
+
+For small sites, or sites where performance is not a concern, you may opt to include the entire dictionary in the app root, meaning that all localisations will be available to all components.
+
+```tsx
+export default function RootLayout({
+  children,
+  params: { locale },
+}: Readonly<{ children: React.ReactNode }> & NextLocTypes.LocaleParam) {
+  const dictionary = compileDictionary({
+    // you may also pass `localeConfig.supported.locales` here if you want to include all supported locales
+    locales: [locale],
+    namespaces: [
+      ...localeConfig.supported.namespaces,
+      ...localeConfig.supported.globalNamespaces,
+    ],
+  });
+
+  return (
+    <html lang={locale}>
+      <body>
+        <LocaleContextProvider {...{ locale }}>
+          <DictionaryContextProvider {...{ dictionary }}>
+            {children}
+          </DictionaryContextProvider>
         </LocaleContextProvider>
         <LocaleLogProvider />
       </body>
@@ -161,21 +223,14 @@ export default function RootLayout({
 }
 ```
 
-Use `useLocaleContext()` to access the locale and dictionary in client components.
-
-```tsx
-const { locale, dictionary } = useLocaleContext();
-```
-
 ### Translate Function
 
 Next Loc also includes a context provider for the `translate` function. This allows you to create a translate function using `genT`, then pass it to the `<TranslationContextProvider />` component, then use `useTranslationContext()` to access the translate function in client components.
 
 ```tsx
-// Using SSR
-
 export const Component = () => {
-  const t = genT(locale, "common.greetings");
+  const t = genT(locale, "common.greetings", dictionary);
+  // OR `const t = useAutoGenT("common.greetings");` if client-side
 
   return (
     <TranslationContextProvider translator={t}>
@@ -191,7 +246,7 @@ export const Component = () => {
 export const ChildComponent = () => {
   const { translator: t } = useTranslationContext();
 
-  return <p>{t("welcome")}</p>;
+  return <p>{t("welcome").valueOf()}</p>;
 };
 ```
 

@@ -9,30 +9,42 @@ import type { NextLocTypes } from "../types";
 
 type LocaleContextValue = {
   locale: NextLocTypes.Locale;
-  dictionary?: NextLocTypes.ThisDictionaryType;
+};
+
+type DictionaryContextValue = {
+  dictionary: NextLocTypes.ThisDictionaryType;
 };
 
 type TranslationContextValue = {
   translator: NextLocTypes.TFunction;
 };
 
-const LocaleContext = createContext<LocaleContextValue>({
+export const LocaleContext = createContext<LocaleContextValue>({
   locale: localeConfig.defaults.locale,
+});
+
+export const DictionaryContext = createContext<DictionaryContextValue>({
   dictionary: undefined,
 });
 
-const TranslationContext = createContext<TranslationContextValue>({
+export const TranslationContext = createContext<TranslationContextValue>({
   translator: genT(),
 });
 
 export const LocaleContextProvider = ({
   children,
   locale,
-  dictionary,
 }: Readonly<{ children: React.ReactNode }> & LocaleContextValue) => (
-  <LocaleContext.Provider value={{ locale, dictionary }}>
+  <LocaleContext.Provider value={{ locale }}>{children}</LocaleContext.Provider>
+);
+
+export const DictionaryContextProvider = ({
+  children,
+  dictionary,
+}: Readonly<{ children: React.ReactNode }> & DictionaryContextValue) => (
+  <DictionaryContext.Provider value={{ dictionary }}>
     {children}
-  </LocaleContext.Provider>
+  </DictionaryContext.Provider>
 );
 
 export const TranslationContextProvider = ({
@@ -47,4 +59,5 @@ export const TranslationContextProvider = ({
 };
 
 export const useLocaleContext = () => useContext(LocaleContext);
+export const useDictionaryContext = () => useContext(DictionaryContext);
 export const useTranslationContext = () => useContext(TranslationContext);

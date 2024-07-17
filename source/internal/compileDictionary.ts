@@ -12,18 +12,57 @@ import type { NextLocTypes } from "../types";
 
 const merger = createMerger({ priority: "right" });
 
-type Return = typeof localeConfig.other.optOutCompression extends true
-  ? NextLocTypes.Dictionary
+type AllLocales = typeof localeConfig.supported.locales;
+type AllNamespaces =
+  | typeof localeConfig.supported.namespaces
+  | typeof localeConfig.supported.globalNamespaces;
+
+export type CompiledDictionary<
+  SelectedLocales extends Readonly<NextLocTypes.Locale[]> = AllLocales,
+  SelectedNamespaces extends Readonly<NextLocTypes.UnionRootNamespace[]> = AllNamespaces
+> = typeof localeConfig.other.optOutCompression extends true
+  ? NextLocTypes.PrundedDictionary<
+      SelectedLocales[number][],
+      SelectedNamespaces[number][]
+    >
   : NextLocTypes.CompressedDictionary;
 
-function compileDictionary(): Return | undefined {
+export type DictionaryCompilationOptions = Readonly<{
+  locales: NextLocTypes.Locale[];
+  namespaces: NextLocTypes.UnionRootNamespace[];
+}>;
+
+type X = ["xyz", "abc", "xyz"];
+
+export function compileDictionary<Options extends DictionaryCompilationOptions>(
+  options?: Options
+): CompiledDictionary<Options["locales"], Options["namespaces"]> | undefined {
   if (typeof window !== "undefined") return undefined;
-  const dictionary = {} as NextLocTypes.Dictionary;
 
-  for (const i_locale of localeConfig.supported.locales) {
-    const localeDictionary = {} as NextLocTypes.LocaleDictionary;
+  const localesToUse = [...new Set(options?.locales ?? localeConfig.supported.locales)];
+  const namespacesToUse = [
+    ...new Set(options?.namespaces ?? localeConfig.supported.namespaces),
+  ];
 
-    for (const i_namespace of localeConfig.supported.namespaces) {
+  type ThisReturnValue = CompiledDictionary<
+    typeof localesToUse,
+    typeof namespacesToUse
+  >;
+
+  const dictionary = {} as NextLocTypes.PrundedDictionary<
+    (typeof localesToUse)[number][],
+    (typeof namespacesToUse)[number][]
+  >;
+
+  for (const i_locale of localesToUse) {
+    const localeDictionary = {} as NextLocTypes.PrunedLocaleDictionary<
+      (typeof namespacesToUse)[number][]
+    >;
+
+    for (const i_namespace of namespacesToUse) {
+      if (!(localeConfig.supported.namespaces as any).includes(i_namespace as any))
+        continue;
+
       const filePath = replaceMultiple(
         localeConfig.other.dictionaryPath,
         ["{locale}", "{namespace}"] as const,
@@ -37,10 +76,7 @@ function compileDictionary(): Return | undefined {
         const fileContents = fs.readFileSync(filePath, "utf8");
         localeDictionary[i_namespace] = JSON.parse(fileContents);
       } catch (error) {
-        if (
-          getShouldSuppressENOENT(i_locale) &&
-          (error as any)?.code === "ENOENT"
-        )
+        if (getShouldSuppressENOENT(i_locale) && (error as any)?.code === "ENOENT")
           continue;
 
         if (supportsColor)
@@ -56,18 +92,16 @@ function compileDictionary(): Return | undefined {
     dictionary[i_locale] = localeDictionary;
   }
 
-  //^ Merge with Inherited Locales
-  for (const i_locale of localeConfig.supported.locales) {
+  //* Merge with Inherited Locales
+  for (const i_locale of localesToUse) {
     if (
       i_locale in localeConfig.meta.inherits &&
-      //@ts-ignore
-      Array.isArray(localeConfig.meta.inherits[i_locale])
+      Array.isArray((localeConfig.meta.inherits as any)[i_locale])
     ) {
-      //@ts-ignore
-      for (const i_inherited of localeConfig.meta.inherits[
+      for (const i_inherited of (localeConfig.meta.inherits as any)[
         i_locale
       ].reverse()) {
-        //^ Reversed -> Locales at the end of the array have higher priority than those at the start
+        //* Reversed -> Locales at the end of the array have higher priority than those at the start
         dictionary[i_locale] = merger(
           dictionary[i_inherited as NextLocTypes.Locale],
           dictionary[i_locale]
@@ -76,11 +110,18 @@ function compileDictionary(): Return | undefined {
     }
   }
 
-  //^ Merge with Global Dictionaries
+  //* Merge with Global Dictionaries
   (() => {
     const globalDictionary = {} as NextLocTypes.GlobalDictionary;
 
-    for (const i_globalNamespace of localeConfig.supported.globalNamespaces) {
+    for (const i_globalNamespace of namespacesToUse) {
+      if (
+        !(localeConfig.supported.globalNamespaces as any).includes(
+          i_globalNamespace as any
+        )
+      )
+        continue;
+
       const filePath = replaceMultiple(
         localeConfig.other.dictionaryPath,
         ["{locale}", "{namespace}"] as const,
@@ -110,15 +151,11 @@ function compileDictionary(): Return | undefined {
       }
     }
 
-    for (const i_locale of localeConfig.supported.locales)
+    for (const i_locale of localesToUse)
       dictionary[i_locale] = merger(globalDictionary, dictionary[i_locale]);
   })();
 
-  //@ts-ignore
-  if (localeConfig.other.optOutCompression) return dictionary;
+  if (localeConfig.other.optOutCompression) return dictionary as any as ThisReturnValue;
   const compressedDictionary = compressFunction(JSON.stringify(dictionary));
-  //@ts-ignore
-  return compressedDictionary;
+  return compressedDictionary as any as ThisReturnValue;
 }
-
-export const dictionary = compileDictionary();
