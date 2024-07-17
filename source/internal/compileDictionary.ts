@@ -32,8 +32,6 @@ export type DictionaryCompilationOptions = Readonly<{
   namespaces: NextLocTypes.UnionRootNamespace[];
 }>;
 
-type X = ["xyz", "abc", "xyz"];
-
 export function compileDictionary<Options extends DictionaryCompilationOptions>(
   options?: Options
 ): CompiledDictionary<Options["locales"], Options["namespaces"]> | undefined {
