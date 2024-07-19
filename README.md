@@ -387,7 +387,7 @@ Next Loc includes support for compressing the dictionary object. The default and
 
 ## Deduplication
 
-Next Loc includes support for deduplication of translations. This can be achieved by setting the `dedup` option in a `genT` or `autoGenT` call to `true`. This will ensure that for any usage of the returned translator function, only one translation will be computed from the dictionary, and all future calls with the same key will return a copy of the first translation. Here is an example:
+Next Loc includes support for deduplication of translations. This can be achieved by setting the `dedup` option in a `genT` or `useAutoGenT` call to `true`. This will ensure that for any usage of the returned translator function, only one translation will be computed from the dictionary, and all future calls with the same key will return a copy of the first translation. Here is an example:
 
 ```tsx
 export const Component = ({ someData }: { someData: Data[] }) => {
