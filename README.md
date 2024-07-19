@@ -116,6 +116,7 @@ _See the [context documentation](#leveraging-context)_ for more information.
 - If no locale is provided, the default locale will be used.
 - The `options` parameter is an optional object containing the following properties:
   - `delayDecompression?: boolean`: If `true`, the dictionary will not be decompressed in the generated function. It will instead be decompressed on each translation call.
+  - `dedup?: boolean`: If `true`, the returned function will deduplicate translations. See [deduplication](#deduplication) for more information.
 
 ```ts
 // Usage with SSR
