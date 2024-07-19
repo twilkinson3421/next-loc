@@ -52,13 +52,11 @@ if (!useDefault) {
   const { value: localeFormat } = await prompt({
     type: "input",
     name: "value",
-    message:
-      "Enter locale format as a regular expression (this can be changed later)",
+    message: "Enter locale format as a regular expression (this can be changed later)",
     initial: "/[a-z]{2}-[A-Z]{2}/",
     validate(value) {
       try {
-        if (!value.trim().length)
-          throw new Error("Locale format cannot be empty");
+        if (!value.trim().length) throw new Error("Locale format cannot be empty");
         new RegExp(value.slice(1, -1));
         return true;
       } catch (error) {
@@ -72,9 +70,7 @@ if (!useDefault) {
     message: "Enter path to dictionary",
     initial: "src/locale/dictionary/{locale}/{namespace}.json",
     validate(value) {
-      return !!value.trim().length
-        ? true
-        : "Path to dictionary cannot be empty";
+      return !!value.trim().length ? true : "Path to dictionary cannot be empty";
     },
   });
   const { value: cookieName } = await prompt({
@@ -137,6 +133,37 @@ function copyFiles(sourceDir, destinationDir) {
       fs.copyFileSync(sourcePath, destinationPath);
     }
   }
+  (() => {
+    const defaultConfig = `{
+      supportedLocales: ["en-GB"],
+      supportedNamespaces: ["common"],
+      globalNamespaces: [],
+      defaultLocale: "en-GB",
+      defaultNamespace: "common",
+      cookieName: "hl",
+      localePattern: /[a-z]{2}-[A-Z]{2}/,
+      dictionaryPath: "src/locale/dictionary/{locale}/{namespace}.json",
+      inherits: {},
+      ignoreMiddleware: [
+        "/static",
+        "/api",
+        "/_next",
+        "favicon.ico",
+        "robots.txt",
+        "sitemap.xml",
+      ],
+      suppress: {
+        missingDictionary: false,
+        localeSatisfiesPattern: false,
+        defaultLocaleIsSupported: false,
+      },
+      optOutCompression: false,
+    }`;
+    const defaultConfigToWrite = `import { createLocaleConfig } from "./internal/controller";\n\nexport const localeConfig = createLocaleConfig(${defaultConfig} as const);`;
+    try {
+      fs.writeFileSync(path.join(sourceDir, "config.ts"), defaultConfigToWrite);
+    } catch (_) {}
+  })();
 }
 copyFiles(sourceDir, destinationDir);
 copySpinner.succeed(`Files copied!`);
