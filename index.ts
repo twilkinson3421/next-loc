@@ -156,11 +156,14 @@ function copyFiles(sourceDir: string, destinationDir: string) {
       fs.copyFileSync(sourcePath, destinationPath);
     }
   }
+}
 
-  // reset the config file
+copyFiles(sourceDir, destinationDir);
 
-  (() => {
-    const defaultConfig = `{
+// reset the config file
+
+(() => {
+  const defaultConfig = `{
       supportedLocales: ["en-GB"],
       supportedNamespaces: ["common"],
       globalNamespaces: [],
@@ -186,17 +189,15 @@ function copyFiles(sourceDir: string, destinationDir: string) {
       optOutCompression: false,
     }`;
 
-    const defaultConfigToWrite = `import { createLocaleConfig } from "./internal/controller";\n\nexport const localeConfig = createLocaleConfig(${defaultConfig} as const);`;
+  const defaultConfigToWrite = `import { createLocaleConfig } from "./internal/controller";\n\nexport const localeConfig = createLocaleConfig(${defaultConfig} as const);`;
 
-    try {
-      fs.writeFileSync(path.join(sourceDir, "config.ts"), defaultConfigToWrite);
-    } catch (_) {
-      //! not much we can do here...
-    }
-  })();
-}
+  try {
+    fs.writeFileSync(path.join(sourceDir, "config.ts"), defaultConfigToWrite);
+  } catch (_) {
+    //! not much we can do here...
+  }
+})();
 
-copyFiles(sourceDir, destinationDir);
 copySpinner.succeed(`Files copied!`);
 
 console.log(

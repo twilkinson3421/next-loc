@@ -133,8 +133,10 @@ function copyFiles(sourceDir, destinationDir) {
       fs.copyFileSync(sourcePath, destinationPath);
     }
   }
-  (() => {
-    const defaultConfig = `{
+}
+copyFiles(sourceDir, destinationDir);
+(() => {
+  const defaultConfig = `{
       supportedLocales: ["en-GB"],
       supportedNamespaces: ["common"],
       globalNamespaces: [],
@@ -159,13 +161,11 @@ function copyFiles(sourceDir, destinationDir) {
       },
       optOutCompression: false,
     }`;
-    const defaultConfigToWrite = `import { createLocaleConfig } from "./internal/controller";\n\nexport const localeConfig = createLocaleConfig(${defaultConfig} as const);`;
-    try {
-      fs.writeFileSync(path.join(sourceDir, "config.ts"), defaultConfigToWrite);
-    } catch (_) {}
-  })();
-}
-copyFiles(sourceDir, destinationDir);
+  const defaultConfigToWrite = `import { createLocaleConfig } from "./internal/controller";\n\nexport const localeConfig = createLocaleConfig(${defaultConfig} as const);`;
+  try {
+    fs.writeFileSync(path.join(sourceDir, "config.ts"), defaultConfigToWrite);
+  } catch (_) {}
+})();
 copySpinner.succeed(`Files copied!`);
 console.log(
   `\nRequired dependencies:\n\x1b[34mchalk\nchalk-konsole\nstring-replace-utils\naccept-language\nsmob\nlz-string\x1b[0m`
