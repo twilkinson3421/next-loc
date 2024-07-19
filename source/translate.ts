@@ -4,6 +4,7 @@ import konsole from "chalk-konsole";
 import { localeConfig } from "./config";
 import { LocalisedString } from "./internal/class";
 import { decompressFunction } from "./internal/compression";
+import { generateLocDedup, iterToTranslator } from "./internal/dedupTranslations";
 
 import type { NextLocTypes } from "./types";
 
@@ -54,11 +55,15 @@ export function translate(
 }
 export type TFunction = typeof translate;
 
+export type TGenOptions = {
+  delayDecompression?: boolean;
+  dedup?: boolean;
+};
 export function genT(
   genLocale?: NextLocTypes.Locale,
   genNamespace?: NextLocTypes.Namespace,
   genDictionary?: NextLocTypes.ThisDictionaryType,
-  options?: { delayDecompression?: boolean }
+  options?: TGenOptions
 ): NextLocTypes.TFunction {
   genLocale ??= localeConfig.defaults.locale;
   genNamespace ??= localeConfig.defaults.namespace;
@@ -66,7 +71,7 @@ export function genT(
   if (typeof genDictionary === "string" && !options?.delayDecompression)
     genDictionary = JSON.parse(decompressFunction(genDictionary));
 
-  return (
+  const thisTFunction = (
     key: string,
     dictionary?: NextLocTypes.ThisDictionaryType,
     overrideLocale?: NextLocTypes.Locale
@@ -76,6 +81,13 @@ export function genT(
       dictionary ?? genDictionary,
       overrideLocale ?? genLocale
     );
+
+  if (options?.dedup) {
+    const iter = generateLocDedup(thisTFunction);
+    return iterToTranslator(iter);
+  }
+
+  return thisTFunction;
 }
 
 export function adaptNamespace(

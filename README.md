@@ -1,6 +1,6 @@
 # **Next Loc**
 
-A modern localisation solution for Next.js, featuring **Full TypeScript support**, **SSR support**, **easy setup & configuration**, **included middleware**, **global dictionaries & dictionary inheritance**.
+A modern localisation solution for Next.js, featuring **Full TypeScript support**, **SSR support**, **easy setup & configuration**, **included middleware**, **global dictionaries & dictionary inheritance**, **compression**, and **translation deduplication**.
 
 ## Installation
 
@@ -167,7 +167,7 @@ const { locale } = useLocaleContext();
 
 ### Dictionary Context
 
-Next Loc includes a dictionary context provider to make it easier to access the current dictionary in client components. The recommended usage is to import the locales & namespaces you need (using `compileDictionary`) and use the context provider to expose the dictionary to any child component which require a certain part of the dictionary. This prevents having to pass the entire dictionary to context, instead only having what is needed avaialable. Here is an exmaple:
+Next Loc includes a dictionary context provider to make it easier to access the current dictionary in client components. The recommended usage is to import the locales & namespaces you need (using `compileDictionary`) and use the context provider to expose the dictionary to any child components which require a certain part of the dictionary. This prevents having to pass the entire dictionary to context, instead only having what is needed available. Here is an exmaple:
 
 ```tsx
 import { compileDictionary } from "./path/to/compileDictionary";
@@ -186,7 +186,7 @@ export const SSRComponent = ({
 };
 ```
 
-Use `useDictionaryContext()` to access the dictionary in client components.
+Use `useDictionaryContext()` to access the, now much smaller, dictionary in client components.
 
 ```tsx
 const { dictionary } = useDictionaryContext();
@@ -383,6 +383,26 @@ For example, if `en-US` inherits from `["en-GB", "en-CA"]`, and the application 
 ## Compression
 
 Next Loc includes support for compressing the dictionary object. The default and recommended compression method is achieved via the use of [lz-string](https://www.npmjs.com/package/lz-string). To change the compression (and decompression) functions, modify the `compressFunction` and `decompressFunction` functions exported from `internal/compression.ts`. For small sites with a small amount of text, or a small number of locales, you should consider opting out of compression to improve performance.
+
+## Deduplication
+
+Next Loc includes support for deduplication of translations. This can be achieved by setting the `dedup` option in a `genT` or `autoGenT` call to `true`. This will ensure that for any usage of the returned translator function, only one translation will be computed from the dictionary, and all future calls with the same key will return a copy of the first translation. Here is an example:
+
+```tsx
+export const Component = ({ someData }: { someData: Data[] }) => {
+  const t = useAutoGenT("common.greetings", { dedup: true });
+
+  return (
+    <div>
+      {someData.map((dataPoint) => {
+        return <div key={dataPoint.id}>{t("welcome").valueOf()}</div>;
+      })}
+    </div>
+  );
+};
+```
+
+In the above example, the translation for `common.greetings.welcome` will only be computed once, each subsequent call to `t("welcome")` will return a copy of the first translation.
 
 ## Using Non-JSON Dictionaries
 
