@@ -11,8 +11,11 @@ export function useAutoGenT(
     dictionary?: NextLocTypes.ThisDictionaryType;
   }
 ): NextLocTypes.TFunction {
-  const locale = override?.locale ?? useLocaleContext().locale;
-  const dictionary = override?.dictionary ?? useDictionaryContext().dictionary;
+  const defaultLocale = useLocaleContext().locale;
+  const defaultDictionary = useDictionaryContext().dictionary;
+
+  const locale = override?.locale ?? defaultLocale;
+  const dictionary = override?.dictionary ?? defaultDictionary;
 
   return genT(locale, genNamespace, dictionary, options);
 }
