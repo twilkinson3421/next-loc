@@ -91,7 +91,10 @@ import { compileDictionary } from "./path/to/compileDictionary";
 
 // Get locale from URL params
 
-const dictionary = compileDictionary({ locales: [locale], namespaces: ["common"] });
+const dictionary = compileDictionary({
+  locales: [locale],
+  namespaces: ["common"],
+});
 const str = translate("common.greetings.welcome", dictionary, locale).valueOf();
 ```
 
@@ -132,9 +135,12 @@ const t = genT(locale, "common.greetings", dictionary);
 const str = t("welcome").valueOf();
 ```
 
-#### **Using `useAutoGenT(namespace, options)` _(best)_**
+#### **Using `useAutoGenT(namespace, options, override)` _(best)_**
 
-`useAutoGenT` is a React Hook provided by Next Loc, which acts as a shorthand for `genT(locale, namespace, dictionary)`. It can be used in client components to prevent having to call `useLocaleContext()` and `useDictionaryContext()` to get the locale and dictionary. Instead, the locale and dictionary are retrieved from context within the hook itself.
+`useAutoGenT` is a React Hook provided by Next Loc, which acts as a shorthand for `genT(locale, namespace, dictionary)`. It can be used in client components to prevent having to call `useLocaleContext()` and `useDictionaryContext()` to get the locale and dictionary. Instead, the locale and dictionary are retrieved from context within the hook itself. The `options` parameter is identical to that of `genT`. The `override` parameter is an optional object containing the following properties:
+
+- `locale?: NextLocTypes.Locale`: Override the locale used in the hook
+- `dictionary?: NextLocTypes.ThisDictionaryType`: Override the dictionary used in the hook
 
 > **⚠️ Translations are not strings by default, but actually instances of a `LocalisedString` class, which is a direct copy of the `Replaceable` class from [string-replace-utils](https://www.npmjs.com/package/string-replace-utils). This simply provides some useful methods for replacing substrings. You can change this behaviour by modifying the return value of the `getTranslation` function _AND_ the return value in the catch block inside the `translate` function. To replace substrings with React components, it is recommended to use [react-string-replace](https://www.npmjs.com/package/react-string-replace) (this may be integrated in a future release).**
 
@@ -152,7 +158,9 @@ export default function RootLayout({
   return (
     <html lang={locale}>
       <body>
-        <LocaleContextProvider {...{ locale }}>{children}</LocaleContextProvider>
+        <LocaleContextProvider {...{ locale }}>
+          {children}
+        </LocaleContextProvider>
         <LocaleLogProvider />
       </body>
     </html>
@@ -177,7 +185,10 @@ export const SSRComponent = ({
   children,
   params: { locale },
 }: Readonly<{ children: React.ReactNode }> & NextLocTypes.LocaleParam) => {
-  const dictionary = compileDictionary({ locales: [locale], namespaces: ["common"] });
+  const dictionary = compileDictionary({
+    locales: [locale],
+    namespaces: ["common"],
+  });
 
   return (
     <DictionaryContextProvider {...{ dictionary }}>

@@ -5,10 +5,14 @@ import type { NextLocTypes } from "../types";
 
 export function useAutoGenT(
   genNamespace?: NextLocTypes.Namespace,
-  options?: TGenOptions
+  options?: TGenOptions,
+  override?: {
+    locale?: NextLocTypes.Locale;
+    dictionary?: NextLocTypes.ThisDictionaryType;
+  }
 ): NextLocTypes.TFunction {
-  const { locale } = useLocaleContext();
-  const { dictionary } = useDictionaryContext();
+  const locale = override?.locale ?? useLocaleContext().locale;
+  const dictionary = override?.dictionary ?? useDictionaryContext().dictionary;
 
   return genT(locale, genNamespace, dictionary, options);
 }
