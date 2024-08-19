@@ -1,14 +1,18 @@
-import chalk, { supportsColor } from "chalk";
-import konsole from "chalk-konsole";
 import { createMerger } from "smob";
-import { replaceMultiple } from "string-replace-utils";
 
 import { localeConfig } from "../config";
 import { compressFunction } from "./compression";
 import { GLOBAL_DICT_DIR_NAME } from "./constants";
-import { getShouldSuppressENOENT } from "./utils";
+import { getShouldSuppressENOENT } from "./utils.ts";
 
 import type { NextLocTypes } from "../types";
+type Replace<
+  S extends string,
+  Match extends string,
+  Replacement extends string
+> = S extends `${infer Before}${Match}${infer After}`
+  ? `${Before}${Replacement}${After}`
+  : S;
 
 const merger = createMerger({ priority: "right" });
 
@@ -19,7 +23,9 @@ type AllNamespaces =
 
 export type CompiledDictionary<
   SelectedLocales extends Readonly<NextLocTypes.Locale[]> = AllLocales,
-  SelectedNamespaces extends Readonly<NextLocTypes.UnionRootNamespace[]> = AllNamespaces
+  SelectedNamespaces extends Readonly<
+    NextLocTypes.UnionRootNamespace[]
+  > = AllNamespaces
 > = typeof localeConfig.other.optOutCompression extends true
   ? NextLocTypes.PrundedDictionary<
       SelectedLocales[number][],
@@ -37,7 +43,9 @@ export function compileDictionary<Options extends DictionaryCompilationOptions>(
 ): CompiledDictionary<Options["locales"], Options["namespaces"]> | undefined {
   if (typeof window !== "undefined") return undefined;
 
-  const localesToUse = [...new Set(options?.locales ?? localeConfig.supported.locales)];
+  const localesToUse = [
+    ...new Set(options?.locales ?? localeConfig.supported.locales),
+  ];
   const namespacesToUse = [
     ...new Set(options?.namespaces ?? localeConfig.supported.namespaces),
   ];
@@ -58,14 +66,22 @@ export function compileDictionary<Options extends DictionaryCompilationOptions>(
     >;
 
     for (const i_namespace of namespacesToUse) {
-      if (!(localeConfig.supported.namespaces as any).includes(i_namespace as any))
+      if (
+        !(localeConfig.supported.namespaces as any).includes(i_namespace as any)
+      )
         continue;
 
-      const filePath = replaceMultiple(
-        localeConfig.other.dictionaryPath,
-        ["{locale}", "{namespace}"] as const,
-        [i_locale, i_namespace] as const
-      );
+      const filePath = localeConfig.other.dictionaryPath
+        .replace("{locale}", i_locale)
+        .replace("{namespace}", i_namespace) as Replace<
+        Replace<
+          typeof localeConfig.other.dictionaryPath,
+          "{locale}",
+          typeof i_locale
+        >,
+        "{namespace}",
+        typeof i_namespace
+      >;
 
       try {
         let fs;
@@ -74,16 +90,17 @@ export function compileDictionary<Options extends DictionaryCompilationOptions>(
         const fileContents = fs.readFileSync(filePath, "utf8");
         localeDictionary[i_namespace] = JSON.parse(fileContents);
       } catch (error) {
-        if (getShouldSuppressENOENT(i_locale) && (error as any)?.code === "ENOENT")
+        if (
+          getShouldSuppressENOENT(i_locale) &&
+          (error as any)?.code === "ENOENT"
+        )
           continue;
 
-        if (supportsColor)
-          konsole.err(
-            `Failed to fetch dictionary from file: ${chalk.yellow(
-              chalk.italic(filePath)
-            )}`,
-            (error as any)?.message ?? null
-          );
+        console.error(
+          `Failed to fetch dictionary from file: \x1b[3;33m${filePath}\x1b[0m\n${
+            (error as any)?.message ?? ""
+          }`
+        );
       }
     }
 
@@ -120,11 +137,17 @@ export function compileDictionary<Options extends DictionaryCompilationOptions>(
       )
         continue;
 
-      const filePath = replaceMultiple(
-        localeConfig.other.dictionaryPath,
-        ["{locale}", "{namespace}"] as const,
-        [GLOBAL_DICT_DIR_NAME, i_globalNamespace] as const
-      );
+      const filePath = localeConfig.other.dictionaryPath
+        .replace("{locale}", GLOBAL_DICT_DIR_NAME)
+        .replace("{namespace}", i_globalNamespace) as Replace<
+        Replace<
+          typeof localeConfig.other.dictionaryPath,
+          "{locale}",
+          typeof GLOBAL_DICT_DIR_NAME
+        >,
+        "{namespace}",
+        typeof i_globalNamespace
+      >;
 
       try {
         let fs;
@@ -139,13 +162,11 @@ export function compileDictionary<Options extends DictionaryCompilationOptions>(
         )
           continue;
 
-        if (supportsColor)
-          konsole.err(
-            `Failed to fetch global dictionary from file: ${chalk.yellow(
-              chalk.italic(filePath)
-            )}`,
-            (error as any)?.message ?? null
-          );
+        console.error(
+          `Failed to fetch global dictionary from file: \x1b[3;33m${filePath}\x1b[0m\n${
+            (error as any)?.message ?? ""
+          }`
+        );
       }
     }
 
@@ -153,7 +174,8 @@ export function compileDictionary<Options extends DictionaryCompilationOptions>(
       dictionary[i_locale] = merger(globalDictionary, dictionary[i_locale]);
   })();
 
-  if (localeConfig.other.optOutCompression) return dictionary as any as ThisReturnValue;
+  if (localeConfig.other.optOutCompression)
+    return dictionary as any as ThisReturnValue;
   const compressedDictionary = compressFunction(JSON.stringify(dictionary));
   return compressedDictionary as any as ThisReturnValue;
 }

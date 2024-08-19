@@ -64,11 +64,13 @@ if (!useDefault) {
   const { value: localeFormat } = await prompt<{ value: string }>({
     type: "input",
     name: "value",
-    message: "Enter locale format as a regular expression (this can be changed later)",
+    message:
+      "Enter locale format as a regular expression (this can be changed later)",
     initial: "/[a-z]{2}-[A-Z]{2}/",
     validate(value) {
       try {
-        if (!value.trim().length) throw new Error("Locale format cannot be empty");
+        if (!value.trim().length)
+          throw new Error("Locale format cannot be empty");
         new RegExp(value.slice(1, -1));
         return true;
       } catch (error) {
@@ -83,7 +85,9 @@ if (!useDefault) {
     message: "Enter path to dictionary",
     initial: "src/locale/dictionary/{locale}/{namespace}.json",
     validate(value) {
-      return !!value.trim().length ? true : "Path to dictionary cannot be empty";
+      return !!value.trim().length
+        ? true
+        : "Path to dictionary cannot be empty";
     },
   });
 
@@ -132,7 +136,9 @@ if (!useDefault) {
     fs.writeFileSync(path.join(sourceDir, "config.ts"), dataToWrite);
     configSpinner.succeed(`Config file written!`);
   } catch (error) {
-    configSpinner.fail(`Failed to write config file: ${(error as any).message}`);
+    configSpinner.fail(
+      `Failed to write config file: ${(error as any).message}`
+    );
   }
 }
 
@@ -201,7 +207,7 @@ copyFiles(sourceDir, destinationDir);
 copySpinner.succeed(`Files copied!`);
 
 console.log(
-  `\nRequired dependencies:\n\x1b[34mchalk\nchalk-konsole\nstring-replace-utils\naccept-language\nsmob\nlz-string\x1b[0m`
+  `\nRequired dependencies:\n\x1b[34maccept-language\nsmob\nlz-string\x1b[0m`
 );
 
 console.log(

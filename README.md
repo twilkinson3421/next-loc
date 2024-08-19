@@ -14,9 +14,6 @@ npm install -g next-loc
 
 Next Loc requires the following packages to be installed in your project directory:
 
-- [`chalk`](https://www.npmjs.com/package/chalk)
-- [`chalk-konsole`](https://www.npmjs.com/package/chalk-konsole)
-- [`string-replace-utils`](https://www.npmjs.com/package/string-replace-utils)
 - [`accept-language`](https://www.npmjs.com/package/accept-language)
 - [`smob`](https://www.npmjs.com/package/smob)
 - [`lz-string`](https://www.npmjs.com/package/lz-string) (can be changed, see [below](#compression))
@@ -95,7 +92,7 @@ const dictionary = compileDictionary({
   locales: [locale],
   namespaces: ["common"],
 });
-const str = translate("common.greetings.welcome", dictionary, locale).valueOf();
+const str = translate("common.greetings.welcome", dictionary, locale);
 ```
 
 ```ts
@@ -103,7 +100,7 @@ const str = translate("common.greetings.welcome", dictionary, locale).valueOf();
 
 const { locale } = useLocaleContext();
 const { dictionary } = useDictionaryContext();
-const str = translate("common.greetings.welcome", dictionary, locale).valueOf();
+const str = translate("common.greetings.welcome", dictionary, locale);
 ```
 
 _See the [context documentation](#leveraging-context)_ for more information.
@@ -125,14 +122,14 @@ _See the [context documentation](#leveraging-context)_ for more information.
 // Usage with SSR
 
 const t = genT(locale, "common.greetings", dictionary);
-const str = t("welcome").valueOf();
+const str = t("welcome");
 ```
 
 ```ts
 // Usage with client components
 
 const t = genT(locale, "common.greetings", dictionary);
-const str = t("welcome").valueOf();
+const str = t("welcome");
 ```
 
 #### **Using `useAutoGenT(namespace, options, override)` _(best)_**
@@ -141,8 +138,6 @@ const str = t("welcome").valueOf();
 
 - `locale?: NextLocTypes.Locale`: Override the locale used in the hook
 - `dictionary?: NextLocTypes.ThisDictionaryType`: Override the dictionary used in the hook
-
-> **⚠️ Translations are not strings by default, but actually instances of a `LocalisedString` class, which is a direct copy of the `Replaceable` class from [string-replace-utils](https://www.npmjs.com/package/string-replace-utils). This simply provides some useful methods for replacing substrings. You can change this behaviour by modifying the return value of the `getTranslation` function _AND_ the return value in the catch block inside the `translate` function. To replace substrings with React components, it is recommended to use [react-string-replace](https://www.npmjs.com/package/react-string-replace) (this may be integrated in a future release).**
 
 ## Leveraging Context
 
@@ -204,7 +199,7 @@ Use `useDictionaryContext()` to access the, now much smaller, dictionary in clie
 const { dictionary } = useDictionaryContext();
 ```
 
-For small sites, or sites where performance is not a concern, you may opt to include the entire dictionary in the app root, meaning that all localisations will be available to all components.
+For small sites, or sites where performance is not a concern, you may opt to include the entire dictionary in the app root, meaning that all localisations will be available to all components. For larger sites, you may consider creating additional dictionary contexts, for example, a global dictionary context, which might contain some commonly used translations. You will need to pass any non-default dictionaries to the override parameter of the `useAutoGenT` hook when using it.
 
 ```tsx
 export default function RootLayout({
@@ -258,7 +253,7 @@ export const Component = () => {
 export const ChildComponent = () => {
   const { translator: t } = useTranslationContext();
 
-  return <p>{t("welcome").valueOf()}</p>;
+  return <p>{t("welcome")}</p>;
 };
 ```
 
@@ -407,7 +402,7 @@ export const Component = ({ someData }: { someData: Data[] }) => {
   return (
     <div>
       {someData.map((dataPoint) => {
-        return <div key={dataPoint.id}>{t("welcome").valueOf()}</div>;
+        return <div key={dataPoint.id}>{t("welcome")}</div>;
       })}
     </div>
   );
